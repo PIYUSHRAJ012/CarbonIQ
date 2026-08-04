@@ -1,3 +1,8 @@
 from django.shortcuts import render
 
-# Create your views here.
+
+def home(request):
+    """
+    Render the application's landing page.
+    """
+    return render(request, "core/home.html")

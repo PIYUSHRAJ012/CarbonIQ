@@ -1,0 +1,61 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+
+        <a class="navbar-brand"
+           href="{% url 'core:home' %}">
+            CarbonIQ
+        </a>
+
+        <div class="ms-auto">
+
+            {% if user.is_authenticated %}
+
+                <span class="text-white me-3">
+                    Hello, {{ user.full_name }}
+                    <a href="{% url 'accounts:profile' %}" class="btn btn-outline-light btn-sm me-2">
+
+                        <i class="bi bi-person-circle"></i> Profile
+
+                    </a>
+                </span>
+
+                <form
+                    method="post"
+                    action="{% url 'accounts:logout' %}"
+                    class="d-inline">
+
+                    {% csrf_token %}
+
+                    <button
+                        class="btn btn-danger btn-sm">
+
+                        Logout
+
+                    </button>
+
+                </form>
+
+            {% else %}
+
+                <a
+                    href="{% url 'accounts:register' %}"
+                    class="btn btn-success btn-sm me-2">
+
+                    Register
+
+                </a>
+
+                <a
+                    href="{% url 'accounts:login' %}"
+                    class="btn btn-outline-light btn-sm">
+
+                    Login
+
+                </a>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+</nav>
