@@ -4,6 +4,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
+*.pyo
 
 # Virtual Environment
 .venv/
@@ -27,7 +28,7 @@ staticfiles/
 .idea/
 
 # ==========================
-# OS Files
+# Operating System
 # ==========================
 .DS_Store
 Thumbs.db
@@ -50,8 +51,36 @@ build/
 .coverage
 htmlcov/
 .pytest_cache/
+.pytest_cache/
 
 # ==========================
-# ML
+# Jupyter / ML
 # ==========================
 .ipynb_checkpoints/
+
+# ==========================
+# MyPy
+# ==========================
+.mypy_cache/
+
+# ==========================
+# Ruff
+# ==========================
+.ruff_cache/
+
+# ==========================
+# Pyright
+# ==========================
+.pyright/
+
+# ==========================
+# macOS
+# ==========================
+.AppleDouble
+.LSOverride
+
+# ==========================
+# Windows
+# ==========================
+ehthumbs.db
+Desktop.ini
