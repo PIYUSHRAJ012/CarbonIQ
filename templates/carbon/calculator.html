@@ -1,0 +1,326 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Carbon Calculator | CarbonIQ
+{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+
+                <div class="mb-4">
+                    <h1 class="h3 mb-2">Carbon Footprint Calculator</h1>
+                    <p class="text-muted mb-0">
+                        Enter your recent activities to calculate your carbon footprint.
+                    </p>
+                </div>
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+
+                    {{ formset.management_form }}
+
+                    {% if formset.non_form_errors %}
+                        <div class="alert alert-danger">
+                            {{ formset.non_form_errors }}
+                        </div>
+                    {% endif %}
+
+                    <div id="activity-formset">
+
+                        {% for form in formset %}
+                            <div class="activity-form border rounded p-3 mb-3">
+
+                                <div class="row g-3 align-items-end">
+
+                                    <div class="col-md-5">
+                                        <label
+                                            for="{{ form.category.id_for_label }}"
+                                            class="form-label"
+                                        >
+                                            Activity Category
+                                        </label>
+
+                                        {{ form.category }}
+
+                                        {% if form.category.errors %}
+                                            <div class="text-danger small mt-1">
+                                                {{ form.category.errors }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label
+                                            for="{{ form.quantity.id_for_label }}"
+                                            class="form-label"
+                                        >
+                                            Quantity
+                                        </label>
+
+                                        {{ form.quantity }}
+
+                                        {% if form.quantity.errors %}
+                                            <div class="text-danger small mt-1">
+                                                {{ form.quantity.errors }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">
+                                            Unit
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            class="form-control unit-display"
+                                            value="—"
+                                            readonly
+                                        >
+                                    </div>
+
+                                    <div class="col-md-1">
+                                        <button
+                                            type="button"
+                                            class="btn btn-outline-danger remove-activity"
+                                            aria-label="Remove activity"
+                                        >
+                                            &times;
+                                        </button>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        {% endfor %}
+
+                    </div>
+
+                    <template id="empty-form-template">
+                        <div class="activity-form border rounded p-3 mb-3">
+
+                            <div class="row g-3 align-items-end">
+
+                                <div class="col-md-5">
+                                    <label class="form-label">
+                                        Activity Category
+                                    </label>
+
+                                    {{ formset.empty_form.category }}
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label">
+                                        Quantity
+                                    </label>
+
+                                    {{ formset.empty_form.quantity }}
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label">
+                                        Unit
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        class="form-control unit-display"
+                                        value="—"
+                                        readonly
+                                    >
+                                </div>
+
+                                <div class="col-md-1">
+                                    <button
+                                        type="button"
+                                        class="btn btn-outline-danger remove-activity"
+                                        aria-label="Remove activity"
+                                    >
+                                        &times;
+                                    </button>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </template>
+
+                    <div class="d-flex justify-content-between align-items-center mt-4">
+
+                        <button
+                            type="button"
+                            class="btn btn-outline-primary"
+                            id="add-activity"
+                        >
+                            + Add Activity
+                        </button>
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary"
+                        >
+                            Calculate Footprint
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+
+{{ category_units|json_script:"category-units-data" }}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const formsetContainer = document.getElementById("activity-formset");
+        const addButton = document.getElementById("add-activity");
+        const totalFormsInput = document.getElementById("id_form-TOTAL_FORMS");
+        const emptyFormTemplate = document.getElementById("empty-form-template");
+
+        const categoryUnits = JSON.parse(
+            document.getElementById("category-units-data").textContent
+        );
+
+        function updateRemoveButtons() {
+            const activityForms = formsetContainer.querySelectorAll(".activity-form");
+            const removeButtons = formsetContainer.querySelectorAll(".remove-activity");
+
+            removeButtons.forEach(function (button) {
+                button.disabled = activityForms.length === 1;
+            });
+        }
+
+        function updateUnitDisplay(activityForm) {
+            const categorySelect = activityForm.querySelector(
+                'select[name$="-category"]'
+            );
+
+            const unitDisplay = activityForm.querySelector(
+                ".unit-display"
+            );
+
+            if (!categorySelect || !unitDisplay) {
+                return;
+            }
+
+            const categoryId = categorySelect.value;
+
+            unitDisplay.value = categoryUnits[categoryId] || "—";
+        }
+
+        function updateAllUnitDisplays() {
+            const activityForms = formsetContainer.querySelectorAll(".activity-form");
+
+            activityForms.forEach(function (activityForm) {
+                updateUnitDisplay(activityForm);
+            });
+        }
+
+        function renumberForms() {
+            const activityForms = formsetContainer.querySelectorAll(".activity-form");
+
+            activityForms.forEach(function (activityForm, index) {
+                activityForm.querySelectorAll("input, select, textarea").forEach(
+                    function (field) {
+                        if (field.name) {
+                            field.name = field.name.replace(
+                                /form-\d+-/,
+                                `form-${index}-`
+                            );
+                        }
+
+                        if (field.id) {
+                            field.id = field.id.replace(
+                                /form-\d+-/,
+                                `form-${index}-`
+                            );
+                        }
+                    }
+                );
+
+                activityForm.querySelectorAll("label").forEach(
+                    function (label) {
+                        if (label.htmlFor) {
+                            label.htmlFor = label.htmlFor.replace(
+                                /form-\d+-/,
+                                `form-${index}-`
+                            );
+                        }
+                    }
+                );
+            });
+
+            totalFormsInput.value = activityForms.length;
+        }
+
+        addButton.addEventListener("click", function () {
+            const formIndex = parseInt(totalFormsInput.value, 10);
+
+            const templateHTML = emptyFormTemplate.innerHTML.replace(
+                /__prefix__/g,
+                formIndex
+            );
+
+            formsetContainer.insertAdjacentHTML(
+                "beforeend",
+                templateHTML
+            );
+
+            totalFormsInput.value = formIndex + 1;
+
+            const newForm = formsetContainer.lastElementChild;
+
+            updateUnitDisplay(newForm);
+            updateRemoveButtons();
+        });
+
+        formsetContainer.addEventListener("change", function (event) {
+            if (event.target.matches('select[name$="-category"]')) {
+                const activityForm = event.target.closest(".activity-form");
+
+                if (activityForm) {
+                    updateUnitDisplay(activityForm);
+                }
+            }
+        });
+
+        formsetContainer.addEventListener("click", function (event) {
+            const removeButton = event.target.closest(".remove-activity");
+
+            if (!removeButton) {
+                return;
+            }
+
+            const activityForm = removeButton.closest(".activity-form");
+
+            if (!activityForm) {
+                return;
+            }
+
+            const activityForms = formsetContainer.querySelectorAll(".activity-form");
+
+            if (activityForms.length === 1) {
+                return;
+            }
+
+            activityForm.remove();
+
+            renumberForms();
+            updateRemoveButtons();
+            updateAllUnitDisplays();
+        });
+    });
+</script>
+{% endblock %}
