@@ -1,0 +1,497 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Dashboard | CarbonIQ
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="fw-bold mb-1">CarbonIQ Dashboard</h1>
+            <p class="text-muted mb-0">
+                Track and understand your carbon footprint.
+            </p>
+        </div>
+
+        <a href="{% url 'carbon:calculator' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-1"></i>
+            Add Activity
+        </a>
+    </div>
+
+
+    <!-- KPI Cards -->
+    <div class="row g-4 mb-4">
+
+        <!-- Total Carbon -->
+        <div class="col-md-6 col-xl-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-2">
+                                Total Carbon Footprint
+                            </p>
+
+                            <h2 class="fw-bold mb-1">
+                                {{ total_emission|floatformat:2 }}
+                                <small class="fs-6 text-muted">kg CO₂e</small>
+                            </h2>
+
+                            <small class="text-muted">
+                                All completed submissions
+                            </small>
+                        </div>
+
+                        <div class="fs-2 text-success">
+                            <i class="bi bi-cloud-haze2"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Months Tracked -->
+        <div class="col-md-6 col-xl-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-2">
+                                Months Tracked
+                            </p>
+
+                            <h2 class="fw-bold mb-1">
+                                {{ monthly_emissions|length }}
+                            </h2>
+
+                            <small class="text-muted">
+                                Months with recorded emissions
+                            </small>
+                        </div>
+
+                        <div class="fs-2 text-primary">
+                            <i class="bi bi-calendar3"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Categories -->
+        <div class="col-md-6 col-xl-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-2">
+                                Categories Tracked
+                            </p>
+
+                            <h2 class="fw-bold mb-1">
+                                {{ category_emissions|length }}
+                            </h2>
+
+                            <small class="text-muted">
+                                Activity categories contributing to emissions
+                            </small>
+                        </div>
+
+                        <div class="fs-2 text-warning">
+                            <i class="bi bi-bar-chart-line"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- Monthly and Weekly Data -->
+    <div class="row g-4 mb-4">
+
+        <!-- Monthly -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <h5 class="fw-bold mb-1">
+                        Monthly Emissions
+                    </h5>
+
+                    <p class="text-muted small mb-0">
+                        Your carbon footprint grouped by month.
+                    </p>
+                </div>
+
+                <div class="card-body px-4">
+
+                    <div id="monthly-emissions-chart" class="w-100 mb-4" style="min-height: 350px;"></div>
+
+                    {% if monthly_emissions %}
+
+                        <div class="table-responsive">
+                            
+                            <table class="table align-middle mb-0">
+
+                                <thead>
+                                    <tr>
+                                        <th>Month</th>
+                                        <th class="text-end">Emission</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    {% for item in monthly_emissions %}
+                                        <tr>
+                                            <td>
+                                                {{ item.month|date:"F Y" }}
+                                            </td>
+
+                                            <td class="text-end fw-semibold">
+                                                {{ item.total_emission|floatformat:2 }}
+                                                kg CO₂e
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+
+                            </table>
+                        </div>
+
+                    {% else %}
+
+                        <div class="text-center py-5">
+                            <i class="bi bi-bar-chart fs-1 text-muted"></i>
+
+                            <p class="text-muted mt-3 mb-0">
+                                No monthly emissions available yet.
+                            </p>
+                        </div>
+
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Weekly -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <h5 class="fw-bold mb-1">
+                        Weekly Emissions
+                    </h5>
+
+                    <p class="text-muted small mb-0">
+                        Your carbon footprint grouped by week.
+                    </p>
+                </div>
+
+                <div class="card-body px-4">
+
+                    <div id="weekly-emissions-chart" class="w-100 mb-4" style="min-height: 350px;"></div>
+
+                    {% if weekly_emissions %}
+
+                        <div class="table-responsive">
+                            <table class="table align-middle mb-0">
+
+                                <thead>
+                                    <tr>
+                                        <th>Week Starting</th>
+                                        <th class="text-end">Emission</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    {% for item in weekly_emissions %}
+                                        <tr>
+                                            <td>
+                                                {{ item.week|date:"d M Y" }}
+                                            </td>
+
+                                            <td class="text-end fw-semibold">
+                                                {{ item.total_emission|floatformat:2 }}
+                                                kg CO₂e
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+
+                            </table>
+                        </div>
+
+                    {% else %}
+
+                        <div class="text-center py-5">
+                            <i class="bi bi-calendar-week fs-1 text-muted"></i>
+
+                            <p class="text-muted mt-3 mb-0">
+                                No weekly emissions available yet.
+                            </p>
+                        </div>
+
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- Category Breakdown -->
+    <div class="row g-4">
+
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <h5 class="fw-bold mb-1">
+                        Category-wise Emissions
+                    </h5>
+
+                    <p class="text-muted small mb-0">
+                        See which activity categories contribute most to your footprint.
+                    </p>
+                </div>
+
+                <div class="card-body px-4">
+
+                    <div class="row justify-content-center mb-4">
+                        <div class="col-lg-7 col-xl-6">
+                            <div style="min-height: 350px;">
+                                <canvas id="category-emissions-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if category_emissions %}
+
+                        <div class="table-responsive">
+                            <table class="table align-middle mb-0">
+
+                                <thead>
+                                    <tr>
+                                        <th>Category</th>
+                                        <th class="text-end">Emission</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+
+                                    {% for item in category_emissions %}
+                                        <tr>
+                                            <td class="fw-semibold">
+                                                {{ item.category__name }}
+                                            </td>
+
+                                            <td class="text-end">
+                                                {{ item.total_emission|floatformat:2 }}
+                                                kg CO₂e
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+
+                                </tbody>
+
+                            </table>
+                        </div>
+
+                    {% else %}
+
+                        <div class="text-center py-5">
+                            <i class="bi bi-pie-chart fs-1 text-muted"></i>
+
+                            <p class="text-muted mt-3 mb-0">
+                                No category emissions available yet.
+                            </p>
+                        </div>
+
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.min.js"></script>
+
+{{ monthly_chart_data|json_script:"monthly-chart-data" }}
+{{ weekly_chart_data|json_script:"weekly-chart-data" }}
+{{ category_chart_data|json_script:"category-chart-data" }}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const categoryData = JSON.parse(
+            document.getElementById("category-chart-data").textContent
+        );
+
+        const monthlyData = JSON.parse(
+            document.getElementById("monthly-chart-data").textContent
+        );
+
+        const weeklyData = JSON.parse(
+            document.getElementById("weekly-chart-data").textContent
+        );
+
+        // Monthly chart
+    if (monthlyData.length > 0) {
+        const monthlyLabels = monthlyData.map(item => item.label);
+        const monthlyValues = monthlyData.map(item => item.value);
+
+        Plotly.newPlot(
+            "monthly-emissions-chart",
+            [
+                {
+                    x: monthlyLabels,
+                    y: monthlyValues,
+                    type: "scatter",
+                    mode: "lines+markers",
+                    hovertemplate:
+                        "<b>%{x}</b><br>" +
+                        "Emission: %{y:.2f} kg CO₂e" +
+                        "<extra></extra>"
+                }
+            ],
+            {
+                title: "Monthly Carbon Trend",
+                xaxis: {
+                    title: "Month"
+                },
+                yaxis: {
+                    title: "kg CO₂e"
+                },
+                margin: {
+                    t: 50,
+                    r: 20,
+                    b: 60,
+                    l: 70
+                },
+                responsive: true
+            },
+            {
+                responsive: true
+            }
+        );
+    }
+
+        // Weekly chart
+    if (weeklyData.length > 0) {
+        const weeklyLabels = weeklyData.map(item => item.label);
+        const weeklyValues = weeklyData.map(item => item.value);
+
+        Plotly.newPlot(
+            "weekly-emissions-chart",
+            [
+                {
+                    x: weeklyLabels,
+                    y: weeklyValues,
+                    type: "scatter",
+                    mode: "lines+markers",
+                    hovertemplate:
+                        "<b>%{x}</b><br>" +
+                        "Emission: %{y:.2f} kg CO₂e" +
+                        "<extra></extra>"
+                }
+            ],
+            {
+                title: "Weekly Carbon Trend",
+                xaxis: {
+                    title: "Week"
+                },
+                yaxis: {
+                    title: "kg CO₂e"
+                },
+                margin: {
+                    t: 50,
+                    r: 20,
+                    b: 60,
+                    l: 70
+                },
+                responsive: true
+            },
+            {
+                responsive: true
+            }
+        );
+    }
+
+    // Category-wise doughnut chart
+if (categoryData.length > 0) {
+
+    const categoryLabels = categoryData.map(
+        item => item.label
+    );
+
+    const categoryValues = categoryData.map(
+        item => item.value
+    );
+
+    const categoryChart = document.getElementById(
+        "category-emissions-chart"
+    );
+
+    new Chart(categoryChart, {
+        type: "doughnut",
+
+        data: {
+            labels: categoryLabels,
+
+            datasets: [
+                {
+                    data: categoryValues
+                }
+            ]
+        },
+
+        options: {
+            responsive: true,
+
+            maintainAspectRatio: false,
+
+            plugins: {
+                legend: {
+                    position: "bottom"
+                },
+
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            return (
+                                context.label +
+                                ": " +
+                                context.parsed.toFixed(2) +
+                                " kg CO₂e"
+                            );
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+});
+</script>
+
+{% endblock %}

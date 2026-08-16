@@ -9,4 +9,7 @@ urlpatterns = [
     path("accounts/", include("accounts.urls")),
 
     path("carbon/", include("carbon.urls")),
+
+    path("dashboard/", include("dashboard.urls")),
+    
 ]
