@@ -53,10 +53,10 @@ class Command(BaseCommand):
 
             _, created = EmissionFactor.objects.get_or_create(
                 activity_category=category,
+                source=factor_data["source"],
+                effective_from=factor_data["effective_from"],
                 defaults={
                     "factor": factor_data["factor"],
-                    "source": factor_data["source"],
-                    "effective_from": factor_data["effective_from"],
                 },
             )
 

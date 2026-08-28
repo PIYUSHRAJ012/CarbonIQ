@@ -49,6 +49,17 @@ class EmissionFactorServiceTests(TestCase):
                 date(2026, 8, 1),
             )
 
+    def test_returns_historical_factor_even_if_inactive(self):
+        self.factor.is_active = False
+        self.factor.save()
+
+        factor = EmissionFactorService.get_factor_for_date(
+            self.category,
+            date(2026, 8, 1),
+        )
+
+        self.assertEqual(factor, self.factor)
+
     def test_respects_effective_date_range(self):
         self.factor.effective_to = date(2026, 6, 30)
         self.factor.save()
@@ -89,3 +100,48 @@ class EmissionFactorServiceTests(TestCase):
                 another_category,
                 date(2026, 8, 1),
             )
+
+    def test_current_lookup_ignores_retired_development_factor(self):
+        self.factor.is_active = False
+        self.factor.save()
+
+        development_factor = EmissionFactor.objects.create(
+            activity_category=self.category,
+            factor=Decimal("0.7080"),
+            source="Development Seed Factor",
+            effective_from=date(2026, 1, 1),
+            effective_to=None,
+            is_active=False,
+        )
+
+        authoritative_factor = EmissionFactor.objects.create(
+            activity_category=self.category,
+            factor=Decimal("0.7117"),
+            source=(
+                "Central Electricity Authority (India) - "
+                "CO2 Baseline Database"
+            ),
+            effective_from=date(2024, 4, 1),
+            effective_to=None,
+            is_active=True,
+        )
+
+        factor = EmissionFactorService.get_active_factor(
+            self.category,
+            date(2026, 8, 1),
+        )
+
+        self.assertEqual(
+            factor,
+            authoritative_factor,
+        )
+
+        self.assertNotEqual(
+            factor,
+            development_factor,
+        )
+
+        self.assertNotEqual(
+            factor,
+            self.factor,
+        )

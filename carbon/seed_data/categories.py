@@ -1,32 +1,80 @@
 DEFAULT_CATEGORIES = [
-        {
-            "name": "Electricity",
-            "description": "Household electricity consumption",
-            "unit": "kWh",
-            "display_order": 1,
-        },
-        {
-            "name": "Transportation",
-            "description": "Distance travelled",
-            "unit": "km",
-            "display_order": 2,
-        },
-        {
-            "name": "Food",
-            "description": "Food consumption",
-            "unit": "meals",
-            "display_order": 3,
-        },
-        {
-            "name": "Shopping",
-            "description": "Shopping expenditure",
-            "unit": "₹",
-            "display_order": 4,
-        },
-        {
-            "name": "Waste",
-            "description": "Waste generated",
-            "unit": "kg",
-            "display_order": 5,
-        },
-    ]
+    {
+        "name": "Electricity",
+        "description": "Household electricity consumption",
+        "unit": "kWh",
+        "display_order": 1,
+    },
+    {
+        "name": "Transportation",
+        "description": "Distance travelled",
+        "unit": "km",
+        "display_order": 2,
+    },
+    {
+        "name": "Petrol",
+        "description": "Petrol fuel consumption",
+        "unit": "litre",
+        "display_order": 3,
+    },
+    {
+        "name": "Diesel",
+        "description": "Diesel fuel consumption",
+        "unit": "litre",
+        "display_order": 4,
+    },
+    {
+        "name": "Rice & Grain",
+        "description": "Rice and grain consumption",
+        "unit": "kg",
+        "display_order": 5,
+    },
+    {
+        "name": "Legumes",
+        "description": "Legume consumption",
+        "unit": "kg",
+        "display_order": 6,
+    },
+    {
+        "name": "Milk",
+        "description": "Milk consumption",
+        "unit": "kg",
+        "display_order": 7,
+    },
+    {
+        "name": "Tofu",
+        "description": "Tofu consumption",
+        "unit": "kg",
+        "display_order": 8,
+    },
+    {
+        "name": "Fruit",
+        "description": "Fruit consumption",
+        "unit": "kg",
+        "display_order": 9,
+    },
+    {
+        "name": "Vegetables",
+        "description": "Vegetable consumption",
+        "unit": "kg",
+        "display_order": 10,
+    },
+    {
+        "name": "Clothing",
+        "description": "Clothing expenditure",
+        "unit": "₹",
+        "display_order": 11,
+    },
+    {
+        "name": "Footwear",
+        "description": "Footwear expenditure",
+        "unit": "₹",
+        "display_order": 12,
+    },
+    {
+        "name": "Waste",
+        "description": "Waste generated",
+        "unit": "kg",
+        "display_order": 13,
+    },
+]
