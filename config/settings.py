@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'core',
     'dashboard',
     'recommendations',
+    "ml",
 ]
 
 MIDDLEWARE = [

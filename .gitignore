@@ -84,3 +84,6 @@ htmlcov/
 # ==========================
 ehthumbs.db
 Desktop.ini
+
+# ML artifacts
+artifacts/ml/
