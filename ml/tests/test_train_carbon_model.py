@@ -17,19 +17,28 @@ class TrainCarbonModelCommandTests(TestCase):
         self.training_result = RandomForestTrainingResult(
             model="mock-random-forest",
             feature_names=(
-                "electricity",
-                "transportation",
-                "food",
+                "previous_electricity",
+                "previous_transportation",
+                "previous_total_emission",
+                "previous_submission_count",
             ),
             sample_count=40,
             training_samples=32,
             test_samples=8,
+            user_count=5,
+            training_period_start="2026-01",
+            training_period_end="2026-04",
+            test_period_start="2026-05",
+            test_period_end="2026-06",
             mae=10.25,
             rmse=14.75,
             r2=0.85,
         )
 
-    @patch("ml.management.commands.train_carbon_model.save_random_forest_model")
+    @patch(
+        "ml.management.commands.train_carbon_model."
+        "save_random_forest_model"
+    )
     @patch(
         "ml.management.commands.train_carbon_model."
         "train_random_forest_from_database"
@@ -57,20 +66,26 @@ class TrainCarbonModelCommandTests(TestCase):
 
         self.assertEqual(
             metadata["model_version"],
-            "rf-v1",
+            "rf-temporal-v1",
+        )
+
+        self.assertEqual(
+            metadata["prediction_type"],
+            "next_month_carbon_footprint",
         )
 
         self.assertEqual(
             metadata["target"],
-            "total_emission",
+            "next_total_emission",
         )
 
         self.assertEqual(
             metadata["features"],
             [
-                "electricity",
-                "transportation",
-                "food",
+                "previous_electricity",
+                "previous_transportation",
+                "previous_total_emission",
+                "previous_submission_count",
             ],
         )
 
@@ -87,6 +102,31 @@ class TrainCarbonModelCommandTests(TestCase):
         self.assertEqual(
             metadata["test_samples"],
             8,
+        )
+
+        self.assertEqual(
+            metadata["user_count"],
+            5,
+        )
+
+        self.assertEqual(
+            metadata["training_period_start"],
+            "2026-01",
+        )
+
+        self.assertEqual(
+            metadata["training_period_end"],
+            "2026-04",
+        )
+
+        self.assertEqual(
+            metadata["test_period_start"],
+            "2026-05",
+        )
+
+        self.assertEqual(
+            metadata["test_period_end"],
+            "2026-06",
         )
 
         self.assertEqual(
@@ -113,14 +153,14 @@ class TrainCarbonModelCommandTests(TestCase):
         mock_train,
     ):
         mock_train.side_effect = MLDataError(
-            "At least 30 completed submissions are required."
+            "At least 30 temporal training transitions are required."
         )
 
         with self.assertRaises(CommandError) as context:
             call_command("train_carbon_model")
 
         self.assertIn(
-            "At least 30 completed submissions are required.",
+            "At least 30 temporal training transitions are required.",
             str(context.exception),
         )
 
@@ -155,7 +195,10 @@ class TrainCarbonModelCommandTests(TestCase):
         mock_train.assert_called_once()
         mock_save.assert_called_once()
 
-    @patch("ml.management.commands.train_carbon_model.save_random_forest_model")
+    @patch(
+        "ml.management.commands.train_carbon_model."
+        "save_random_forest_model"
+    )
     @patch(
         "ml.management.commands.train_carbon_model."
         "train_random_forest_from_database"

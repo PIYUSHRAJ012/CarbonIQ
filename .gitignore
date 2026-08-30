@@ -87,3 +87,7 @@ Desktop.ini
 
 # ML artifacts
 artifacts/ml/
+
+# ML research datasets
+ml/data/external/japan_household/raw/
+ml/data/external/japan_household/processed/

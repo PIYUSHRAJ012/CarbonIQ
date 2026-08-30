@@ -17,24 +17,25 @@ from ml.training.random_forest import (
 logger = logging.getLogger(__name__)
 
 
-MODEL_VERSION = "rf-v1"
-TARGET_NAME = "total_emission"
+MODEL_VERSION = "rf-temporal-v1"
+TARGET_NAME = "next_total_emission"
 
 
 class Command(BaseCommand):
     """
-    Train the CarbonIQ Random Forest carbon-footprint prediction model.
+    Train the CarbonIQ temporal Random Forest carbon-footprint
+    prediction model.
     """
 
     help = (
-        "Train the Random Forest carbon-footprint prediction model "
-        "using completed CarbonIQ submissions."
+        "Train the temporal Random Forest carbon-footprint "
+        "prediction model using completed CarbonIQ submissions."
     )
 
     def handle(self, *args, **options):
         self.stdout.write(
             self.style.NOTICE(
-                "Preparing Random Forest training dataset..."
+                "Preparing Random Forest temporal training dataset..."
             )
         )
 
@@ -43,11 +44,17 @@ class Command(BaseCommand):
 
             metadata = {
                 "model_version": MODEL_VERSION,
+                "prediction_type": "next_month_carbon_footprint",
                 "target": TARGET_NAME,
                 "features": list(result.feature_names),
                 "sample_count": result.sample_count,
                 "training_samples": result.training_samples,
                 "test_samples": result.test_samples,
+                "user_count": result.user_count,
+                "training_period_start": result.training_period_start,
+                "training_period_end": result.training_period_end,
+                "test_period_start": result.test_period_start,
+                "test_period_end": result.test_period_end,
                 "mae": result.mae,
                 "rmse": result.rmse,
                 "r2": result.r2,
@@ -81,9 +88,16 @@ class Command(BaseCommand):
         )
 
         self.stdout.write("")
+
         self.stdout.write(
             self.style.NOTICE(
                 f"Samples: {result.sample_count}"
+            )
+        )
+
+        self.stdout.write(
+            self.style.NOTICE(
+                f"Users: {result.user_count}"
             )
         )
 
@@ -106,6 +120,37 @@ class Command(BaseCommand):
         )
 
         self.stdout.write("")
+
+        self.stdout.write(
+            self.style.NOTICE(
+                "Training target period:"
+            )
+        )
+
+        self.stdout.write(
+            self.style.NOTICE(
+                f"  {result.training_period_start}"
+                f" → "
+                f"{result.training_period_end}"
+            )
+        )
+
+        self.stdout.write(
+            self.style.NOTICE(
+                "Test target period:"
+            )
+        )
+
+        self.stdout.write(
+            self.style.NOTICE(
+                f"  {result.test_period_start}"
+                f" → "
+                f"{result.test_period_end}"
+            )
+        )
+
+        self.stdout.write("")
+
         self.stdout.write(
             self.style.NOTICE(
                 f"MAE : {result.mae:.4f}"
@@ -125,6 +170,7 @@ class Command(BaseCommand):
         )
 
         self.stdout.write("")
+
         self.stdout.write(
             self.style.NOTICE(
                 f"Model saved: {model_path}"
