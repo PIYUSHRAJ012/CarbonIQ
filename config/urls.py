@@ -11,5 +11,10 @@ urlpatterns = [
     path("carbon/", include("carbon.urls")),
 
     path("dashboard/", include("dashboard.urls")),
+
+    path(
+        "recommendations/",
+        include("recommendations.urls"),
+    ),
     
 ]

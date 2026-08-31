@@ -3,6 +3,9 @@ from django.shortcuts import get_object_or_404, redirect, render
 from carbon.models import ActivityCategory, CarbonActivity
 from .forms import ActivityEntryFormSet
 from .services.submission import CarbonSubmissionService
+from recommendations.services.integration import (
+    refresh_user_recommendations,
+)
 
 @login_required
 def calculator(request):
@@ -27,7 +30,7 @@ def calculator(request):
                 user=request.user,
                 entries_data=entries_data,
             )
-
+            refresh_user_recommendations(request.user)
             return redirect(
                 "carbon:result",
                 pk=activity.pk,

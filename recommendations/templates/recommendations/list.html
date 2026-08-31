@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Recommendations | CarbonIQ
+{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="fw-bold mb-1">Your Recommendations</h1>
+        <p class="text-muted mb-0">
+            Personalized sustainability actions based on your CarbonIQ data.
+        </p>
+    </div>
+</div>
+
+
+<!-- Sustainability Recommendations -->
+
+<div class="card border-0 shadow-sm mb-4">
+
+    <div class="card-header bg-white border-0 pt-4 px-4">
+
+        <h4 class="fw-bold mb-1">
+            Sustainability Actions
+        </h4>
+
+        <p class="text-muted small mb-0">
+            Actions prioritized according to your current carbon footprint.
+        </p>
+
+    </div>
+
+
+    <div class="card-body px-4 pb-4">
+
+        {% if sustainability_recommendations %}
+
+            <div class="row g-4">
+
+                {% for item in sustainability_recommendations %}
+
+                    <div class="col-md-6 col-xl-4">
+
+                        <div class="card h-100 border shadow-sm">
+
+                            <div class="card-body d-flex flex-column">
+
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+
+                                    <h5 class="fw-bold mb-0">
+                                        {{ item.recommendation.title }}
+                                    </h5>
+
+                                    <span class="badge bg-success">
+                                        {{ item.score|floatformat:1 }}/100
+                                    </span>
+
+                                </div>
+
+
+                                {% if item.recommendation.category %}
+
+                                    <p class="small text-muted mb-2">
+                                        <strong>Category:</strong>
+                                        {{ item.recommendation.category.name }}
+                                    </p>
+
+                                {% endif %}
+
+
+                                <p class="text-muted">
+                                    {{ item.recommendation.description }}
+                                </p>
+
+
+                                <div class="mt-auto pt-3 border-top">
+
+                                    <p class="small mb-2">
+                                        <strong>Why this is recommended:</strong>
+                                    </p>
+
+                                    <p class="small text-muted mb-3">
+                                        {{ item.reason }}
+                                    </p>
+
+
+                                    <div class="d-flex gap-2">
+
+                                        <!-- Mark Completed -->
+
+                                        <form
+                                            method="post"
+                                            action="{% url 'recommendations:complete' item.id %}"
+                                        >
+                                            {% csrf_token %}
+
+                                            <button
+                                                type="submit"
+                                                class="btn btn-success btn-sm"
+                                            >
+                                                Mark Completed
+                                            </button>
+
+                                        </form>
+
+
+                                        <!-- Dismiss -->
+
+                                        <form
+                                            method="post"
+                                            action="{% url 'recommendations:dismiss' item.id %}"
+                                        >
+                                            {% csrf_token %}
+
+                                            <button
+                                                type="submit"
+                                                class="btn btn-outline-secondary btn-sm"
+                                            >
+                                                Dismiss
+                                            </button>
+
+                                        </form>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="text-center py-5">
+
+                <div class="display-6 mb-3">
+                    🌱
+                </div>
+
+                <h5 class="fw-bold">
+                    No personalized recommendations yet
+                </h5>
+
+                <p class="text-muted mb-0">
+                    Record some carbon activity to start receiving
+                    personalized sustainability recommendations.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<!-- Carbon Offset Suggestions -->
+
+<div class="card border-0 shadow-sm">
+
+    <div class="card-header bg-white border-0 pt-4 px-4">
+
+        <h4 class="fw-bold mb-1">
+            Carbon Offset Suggestions
+        </h4>
+
+        <p class="text-muted small mb-0">
+            Consider these only as a complementary option for
+            residual emissions.
+        </p>
+
+    </div>
+
+
+    <div class="card-body px-4 pb-4">
+
+        {% if offset_recommendations %}
+
+            <div class="row g-4">
+
+                {% for item in offset_recommendations %}
+
+                    <div class="col-md-6 col-xl-4">
+
+                        <div class="card h-100 border shadow-sm">
+
+                            <div class="card-body d-flex flex-column">
+
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+
+                                    <h5 class="fw-bold mb-0">
+                                        {{ item.recommendation.title }}
+                                    </h5>
+
+                                    <span class="badge bg-secondary">
+                                        Offset
+                                    </span>
+
+                                </div>
+
+
+                                <p class="text-muted">
+                                    {{ item.recommendation.description }}
+                                </p>
+
+
+                                <div class="mt-auto pt-3 border-top">
+
+                                    <p class="small mb-0">
+                                        <strong>Why this is shown:</strong>
+                                    </p>
+
+                                    <p class="small text-muted mb-0">
+                                        {{ item.reason }}
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="text-center py-4">
+
+                <p class="text-muted mb-0">
+                    No offset suggestions are currently available.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

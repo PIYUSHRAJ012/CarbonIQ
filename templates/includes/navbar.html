@@ -16,7 +16,11 @@
                     <a href="{% url 'dashboard:home' %}" class="btn btn-outline-light btn-sm me-2">
                         <i class="bi bi-speedometer2"></i> Dashboard
                     </a>
-
+                    <a
+                        href="{% url 'recommendations:list' %}"
+                        class="btn btn-outline-light btn-sm me-2">
+                        <i class="bi bi-lightbulb"></i> Recommendations
+                    </a>
                     <a href="{% url 'accounts:profile' %}" class="btn btn-outline-light btn-sm me-2">
                         <i class="bi bi-person-circle"></i> Profile
                     </a>
