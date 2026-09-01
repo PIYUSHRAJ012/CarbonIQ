@@ -8,6 +8,10 @@ from django.conf import settings
 
 from django.core.exceptions import ValidationError
 
+class BenchmarkScope(models.TextChoices):
+    NATIONAL = "NATIONAL", "National"
+    DISTRICT = "DISTRICT", "District"
+
 class ActivityCategory(TimeStampedModel):
     """
     Represents a category of carbon-emitting activity,
@@ -299,4 +303,164 @@ class CarbonFootprint(TimeStampedModel):
         return (
             f"{self.carbon_activity.user.email} - "
             f"{self.total_emission} kg CO₂e"
+        )
+
+class UserLocation(TimeStampedModel):
+    """
+    Stores the Indian geographic context used for
+    carbon-footprint benchmarking.
+    """
+
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="location",
+        help_text="CarbonIQ user associated with this geographic context.",
+    )
+
+    state = models.CharField(
+        max_length=100,
+        help_text="Indian state or union territory.",
+    )
+
+    district = models.CharField(
+        max_length=100,
+        help_text="Indian district used for regional benchmarking.",
+    )
+
+    class Meta:
+        verbose_name = "User Location"
+        verbose_name_plural = "User Locations"
+        indexes = [
+            models.Index(fields=["state"]),
+            models.Index(fields=["state", "district"]),
+        ]
+
+    def __str__(self):
+        return f"{self.district}, {self.state}"
+
+class CarbonBenchmark(TimeStampedModel):
+    """
+    Stores external carbon-footprint benchmark/reference values
+    used by CarbonIQ for sustainability comparisons.
+    """
+
+    scope = models.CharField(
+        max_length=20,
+        choices=BenchmarkScope.choices,
+        help_text="Geographic scope of the benchmark.",
+    )
+
+    state = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        help_text="Indian state for district-level benchmarks.",
+    )
+
+    district = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        help_text="Indian district for district-level benchmarks.",
+    )
+
+    reference_period = models.CharField(
+        max_length=20,
+        help_text="Reference period of the source, e.g. 2011-2012 or 2024.",
+    )
+
+    value = models.DecimalField(
+        max_digits=12,
+        decimal_places=3,
+        help_text="Benchmark value in the stored source unit.",
+    )
+
+    unit = models.CharField(
+        max_length=100,
+        help_text="Original unit of the benchmark value.",
+    )
+
+    population_basis = models.CharField(
+        max_length=50,
+        default="per_capita",
+        help_text="Population basis, e.g. per_capita or per_household.",
+    )
+
+    source = models.CharField(
+        max_length=255,
+        help_text="Human-readable source or publication name.",
+    )
+
+    source_reference = models.URLField(
+        max_length=500,
+        blank=True,
+        help_text="DOI or authoritative source URL.",
+    )
+
+    methodology = models.TextField(
+        blank=True,
+        help_text="Description of the benchmark methodology and scope.",
+    )
+
+    effective_from = models.DateField(
+        blank=True,
+        null=True,
+        help_text="Date from which this benchmark is considered applicable.",
+    )
+
+    effective_to = models.DateField(
+        blank=True,
+        null=True,
+        help_text="Date until which this benchmark is considered applicable.",
+    )
+
+    is_active = models.BooleanField(
+        default=True,
+        help_text="Whether this benchmark can currently be selected.",
+    )
+
+    class Meta:
+        verbose_name = "Carbon Benchmark"
+        verbose_name_plural = "Carbon Benchmarks"
+
+        indexes = [
+            models.Index(
+                fields=["scope", "state", "district"]
+            ),
+            models.Index(
+                fields=["is_active"]
+            ),
+            models.Index(
+                fields=["reference_period"]
+            ),
+        ]
+
+        constraints = [
+            models.CheckConstraint(
+                condition=(
+                    models.Q(scope=BenchmarkScope.NATIONAL, state__isnull=True, district__isnull=True)
+                    |
+                    models.Q(
+                        scope=BenchmarkScope.DISTRICT,
+                        state__isnull=False,
+                        district__isnull=False,
+                    )
+                ),
+                name="valid_benchmark_geography",
+            ),
+
+            models.CheckConstraint(
+                condition=models.Q(value__gte=0),
+                name="benchmark_value_non_negative",
+            ),
+        ]
+
+    def __str__(self):
+        if self.scope == BenchmarkScope.NATIONAL:
+            return f"India - {self.reference_period}"
+
+        return (
+            f"{self.district}, {self.state} - "
+            f"{self.reference_period}"
         )

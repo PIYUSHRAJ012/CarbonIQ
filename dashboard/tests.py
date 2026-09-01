@@ -8,13 +8,15 @@ from accounts.models import CustomUser
 from carbon.models import (
     ActivityCategory,
     ActivityEntry,
+    BenchmarkScope,
     CarbonActivity,
+    CarbonBenchmark,
     CarbonFootprint,
     EmissionFactor,
+    UserLocation,
 )
 
 from dashboard.services.dashboard import DashboardService
-
 
 class DashboardServiceTests(TestCase):
     """
@@ -131,6 +133,62 @@ class DashboardServiceTests(TestCase):
             data["category_chart_data"],
             [],
         )
+    def test_dashboard_contains_benchmark_data_when_location_exists(self):
+        CarbonBenchmark.objects.create(
+            scope=BenchmarkScope.DISTRICT,
+            state="KARNATAKA",
+            district="Mysore",
+            reference_period="2011-2012",
+            value=Decimal("0.613"),
+            unit="tCO2/person/year",
+            population_basis="per_capita",
+            source="Test Source",
+            source_reference="test://benchmark",
+            methodology="Test methodology",
+            is_active=True,
+        )
+
+        CarbonBenchmark.objects.create(
+            scope=BenchmarkScope.NATIONAL,
+            reference_period="2011-2012",
+            value=Decimal("0.560"),
+            unit="tCO2/person/year",
+            population_basis="per_capita",
+            source="Test Source",
+            source_reference="test://benchmark",
+            methodology="Test methodology",
+            is_active=True,
+        )
+
+        UserLocation.objects.create(
+            user=self.user,
+            state="Karnataka",
+            district="Mysore",
+        )
+
+        data = DashboardService.get_dashboard_data(self.user)
+
+        self.assertIsNotNone(data["benchmark_comparison"])
+        self.assertEqual(
+            data["benchmark_resolution"].scope,
+            BenchmarkScope.DISTRICT,
+        )
+        self.assertFalse(
+            data["benchmark_resolution"].used_fallback,
+        )
+        self.assertEqual(
+            data["benchmark_monthly_kg"],
+            Decimal("0.613") * Decimal("1000") / Decimal("12"),
+        )
+
+
+    def test_dashboard_benchmark_data_is_none_without_location(self):
+        data = DashboardService.get_dashboard_data(self.user)
+
+        self.assertIsNone(data["benchmark_comparison"])
+        self.assertIsNone(data["benchmark_resolution"])
+        self.assertIsNone(data["benchmark_monthly_kg"])
+        self.assertEqual(data["benchmark_monthly_comparisons"], ())
 
 class DashboardViewTests(TestCase):
     """
@@ -159,3 +217,50 @@ class DashboardViewTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
+
+    def test_dashboard_renders_national_fallback(self):
+        CarbonBenchmark.objects.create(
+            scope=BenchmarkScope.NATIONAL,
+            reference_period="2011-2012",
+            value=Decimal("0.560"),
+            unit="tCO2/person/year",
+            population_basis="per_capita",
+            source="Test Source",
+            source_reference="test://benchmark",
+            methodology="Test methodology",
+            is_active=True,
+        )
+
+        UserLocation.objects.create(
+            user=self.user,
+            state="KARNATAKA",
+            district="Unknown District",
+        )
+
+        self.client.force_login(self.user)
+
+        response = self.client.get(
+            reverse("dashboard:home")
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertContains(
+            response,
+            "India — National",
+        )
+
+        self.assertContains(
+            response,
+            "National benchmark",
+        )
+
+        self.assertContains(
+            response,
+            "2011-2012",
+        )
+
+        self.assertContains(
+            response,
+            "46.67",
+        )

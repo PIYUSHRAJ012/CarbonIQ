@@ -6,6 +6,8 @@ from .models import (
     CarbonActivity,
     ActivityEntry,
     CarbonFootprint,
+    UserLocation,
+    CarbonBenchmark,
 )
 
 @admin.register(ActivityEntry)
@@ -117,4 +119,68 @@ class ActivityCategoryAdmin(admin.ModelAdmin):
         "name",
     )
 
-    
+@admin.register(UserLocation)
+class UserLocationAdmin(admin.ModelAdmin):
+    list_display = (
+        "user",
+        "state",
+        "district",
+        "created_at",
+        "updated_at",
+    )
+
+    list_filter = (
+        "state",
+    )
+
+    search_fields = (
+        "user__email",
+        "user__full_name",
+        "state",
+        "district",
+    )
+
+    ordering = (
+        "state",
+        "district",
+    )
+
+@admin.register(CarbonBenchmark)
+class CarbonBenchmarkAdmin(admin.ModelAdmin):
+    list_display = (
+        "scope",
+        "state",
+        "district",
+        "reference_period",
+        "value",
+        "unit",
+        "source",
+        "is_active",
+    )
+
+    list_filter = (
+        "scope",
+        "state",
+        "is_active",
+        "population_basis",
+    )
+
+    search_fields = (
+        "state",
+        "district",
+        "source",
+        "source_reference",
+        "reference_period",
+    )
+
+    ordering = (
+        "scope",
+        "state",
+        "district",
+        "-reference_period",
+    )
+
+    readonly_fields = (
+        "created_at",
+        "updated_at",
+    )

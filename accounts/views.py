@@ -5,7 +5,10 @@ from django.contrib.auth.decorators import login_required
 from .forms import (
     CustomAuthenticationForm,
     CustomUserCreationForm,
+    UserLocationForm,
 )
+
+from carbon.models import UserLocation
 
 from django.contrib.auth import login
 from django.contrib.auth.views import LoginView
@@ -59,12 +62,46 @@ class CustomLoginView(LoginView):
 
     def get_success_url(self):
         return "/"
+
 @login_required
 def profile_view(request):
     """
-    Display the logged-in user's profile.
+    Display and update the logged-in user's profile and
+    benchmarking location.
     """
+
+    try:
+        location = request.user.location
+    except UserLocation.DoesNotExist:
+        location = None
+
+    if request.method == "POST":
+        form = UserLocationForm(
+            request.POST,
+            instance=location,
+        )
+
+        if form.is_valid():
+            saved_location = form.save(commit=False)
+            saved_location.user = request.user
+            saved_location.save()
+
+            messages.success(
+                request,
+                "Benchmarking location updated successfully.",
+            )
+
+            return redirect("accounts:profile")
+
+    else:
+        form = UserLocationForm(instance=location)
+
     return render(
         request,
         "accounts/profile.html",
+        {
+            "form": form,
+            "location": location,
+            "districts_by_state": form.districts_by_state,
+        },
     )

@@ -91,3 +91,7 @@ artifacts/ml/
 # ML research datasets
 ml/data/external/japan_household/raw/
 ml/data/external/japan_household/processed/
+
+# E4 benchmark source/reference data
+data/benchmarks/raw/
+data/benchmarks/processed/

@@ -113,6 +113,294 @@
 
     </div>
 
+    <!-- Carbon Benchmark -->
+    <div class="row g-4 mb-4">
+
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <h5 class="fw-bold mb-1">
+                        <i class="bi bi-speedometer2 me-1"></i>
+                        Carbon Benchmark
+                    </h5>
+
+                    <p class="text-muted small mb-0">
+                        Compare your monthly carbon footprint with a
+                        location-based benchmark.
+                    </p>
+                </div>
+
+                <div class="card-body px-4">
+
+                    {% if benchmark_resolution %}
+
+                        <div class="row g-4">
+
+                            <!-- Benchmark information -->
+                            <div class="col-md-5">
+                                <div class="border rounded p-4 h-100">
+
+                                    <p class="text-muted small mb-2">
+                                        Benchmark
+                                    </p>
+
+                                    <h4 class="fw-bold mb-1">
+                                        {% if benchmark_resolution.scope == "DISTRICT" %}
+                                            {{ benchmark_resolution.benchmark.district }},
+                                            {{ benchmark_resolution.benchmark.state }}
+                                        {% else %}
+                                            India — National
+                                        {% endif %}
+                                    </h4>
+
+                                    <p class="text-muted mb-3">
+                                        {% if benchmark_resolution.scope == "DISTRICT" %}
+                                            District benchmark
+                                        {% else %}
+                                            National benchmark
+                                        {% endif %}
+                                    </p>
+
+                                    <h3 class="fw-bold mb-1">
+                                        {{ benchmark_monthly_kg|floatformat:2 }}
+                                        <small class="fs-6 text-muted">
+                                            kg CO₂e/person/month
+                                        </small>
+                                    </h3>
+
+                                    <small class="text-muted">
+                                        Based on the {{ benchmark_resolution.benchmark.reference_period }}
+                                        reference period
+                                    </small>
+
+                                </div>
+                            </div>
+
+
+                            <!-- Latest comparison -->
+                            <div class="col-md-7">
+
+                                {% if benchmark_monthly_comparisons %}
+
+                                    {% with latest=benchmark_monthly_comparisons|last %}
+
+                                        <div class="border rounded p-4 h-100">
+
+                                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                                <div>
+                                                    <p class="text-muted small mb-1">
+                                                        Latest recorded month
+                                                    </p>
+
+                                                    <h5 class="fw-bold mb-0">
+                                                        {{ latest.month }}
+                                                    </h5>
+                                                </div>
+
+                                                {% if latest.below_benchmark %}
+                                                    <span class="badge text-bg-success">
+                                                        Below benchmark
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge text-bg-warning">
+                                                        Above benchmark
+                                                    </span>
+                                                {% endif %}
+                                            </div>
+
+
+                                            <div class="row g-3">
+
+                                                <div class="col-sm-4">
+                                                    <p class="text-muted small mb-1">
+                                                        Your emission
+                                                    </p>
+
+                                                    <h5 class="fw-bold mb-0">
+                                                        {{ latest.personal_emission_kg|floatformat:2 }}
+                                                        <small class="text-muted">kg</small>
+                                                    </h5>
+                                                </div>
+
+
+                                                <div class="col-sm-4">
+                                                    <p class="text-muted small mb-1">
+                                                        Benchmark
+                                                    </p>
+
+                                                    <h5 class="fw-bold mb-0">
+                                                        {{ latest.benchmark_emission_kg|floatformat:2 }}
+                                                        <small class="text-muted">kg</small>
+                                                    </h5>
+                                                </div>
+
+
+                                                <div class="col-sm-4">
+                                                    <p class="text-muted small mb-1">
+                                                        Difference
+                                                    </p>
+
+                                                    <h5 class="fw-bold mb-0">
+                                                        {{ latest.difference_percent|floatformat:1 }}%
+                                                    </h5>
+                                                </div>
+
+                                            </div>
+
+
+                                            <hr>
+
+
+                                            <p class="text-muted small mb-0">
+                                                {% if latest.below_benchmark %}
+                                                    Your recorded emissions for this month
+                                                    are below the selected benchmark.
+                                                {% else %}
+                                                    Your recorded emissions for this month
+                                                    are above the selected benchmark.
+                                                {% endif %}
+                                            </p>
+
+                                        </div>
+
+                                    {% endwith %}
+
+                                {% else %}
+
+                                    <div class="border rounded p-4 h-100
+                                                d-flex flex-column justify-content-center">
+
+                                        <h5 class="fw-bold">
+                                            No monthly comparison yet
+                                        </h5>
+
+                                        <p class="text-muted mb-0">
+                                            Record a completed carbon activity to
+                                            compare your footprint with the benchmark.
+                                        </p>
+
+                                    </div>
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Historical comparison -->
+                        {% if benchmark_monthly_comparisons|length > 1 %}
+
+                            <div class="mt-4">
+
+                                <h6 class="fw-bold mb-3">
+                                    Historical Benchmark Comparison
+                                </h6>
+
+                                <div class="table-responsive">
+
+                                    <table class="table align-middle mb-0">
+
+                                        <thead>
+                                            <tr>
+                                                <th>Month</th>
+                                                <th class="text-end">Your Emission</th>
+                                                <th class="text-end">Benchmark</th>
+                                                <th class="text-end">Difference</th>
+                                                <th class="text-end">Status</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+
+                                            {% for item in benchmark_monthly_comparisons %}
+
+                                                <tr>
+
+                                                    <td>
+                                                        {{ item.month }}
+                                                    </td>
+
+                                                    <td class="text-end fw-semibold">
+                                                        {{ item.personal_emission_kg|floatformat:2 }}
+                                                        kg
+                                                    </td>
+
+                                                    <td class="text-end">
+                                                        {{ item.benchmark_emission_kg|floatformat:2 }}
+                                                        kg
+                                                    </td>
+
+                                                    <td class="text-end">
+                                                        {{ item.difference_percent|floatformat:1 }}%
+                                                    </td>
+
+                                                    <td class="text-end">
+
+                                                        {% if item.below_benchmark %}
+                                                            <span class="badge text-bg-success">
+                                                                Below
+                                                            </span>
+                                                        {% else %}
+                                                            <span class="badge text-bg-warning">
+                                                                Above
+                                                            </span>
+                                                        {% endif %}
+
+                                                    </td>
+
+                                                </tr>
+
+                                            {% endfor %}
+
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+
+                            </div>
+
+                        {% endif %}
+
+
+                        {% if benchmark_resolution.used_fallback %}
+
+                            <div class="alert alert-info mt-4 mb-0">
+                                <i class="bi bi-info-circle me-1"></i>
+                                A district benchmark was not available for your
+                                location, so the India national benchmark is being used.
+                            </div>
+
+                        {% endif %}
+
+
+                    {% else %}
+
+                        <div class="text-center py-4">
+
+                            <i class="bi bi-geo-alt fs-1 text-muted"></i>
+
+                            <h5 class="fw-bold mt-3">
+                                Set your location to see your benchmark
+                            </h5>
+
+                            <p class="text-muted mb-0">
+                                Add your state and district to compare your
+                                carbon footprint with a regional or national benchmark.
+                            </p>
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
 
     <!-- Monthly and Weekly Data -->
     <div class="row g-4 mb-4">

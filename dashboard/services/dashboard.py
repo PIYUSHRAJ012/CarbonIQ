@@ -1,5 +1,5 @@
 from analytics.services.aggregation import AnalyticsAggregationService
-
+from carbon.services.comparison import get_user_monthly_benchmark_comparison
 
 class DashboardService:
     """
@@ -24,6 +24,11 @@ class DashboardService:
         category_emissions = list(
             AnalyticsAggregationService.get_category_emissions(user)
         )
+
+        try:
+            benchmark_comparison = get_user_monthly_benchmark_comparison(user)
+        except ValueError:
+            benchmark_comparison = None
 
         return {
             "total_emission": (
@@ -59,4 +64,22 @@ class DashboardService:
                 }
                 for item in category_emissions
             ],
+
+            # E4 Benchmark comparison
+            "benchmark_comparison": benchmark_comparison,
+            "benchmark_resolution": (
+                benchmark_comparison.benchmark_resolution
+                if benchmark_comparison
+                else None
+            ),
+            "benchmark_monthly_kg": (
+                benchmark_comparison.benchmark_monthly_kg
+                if benchmark_comparison
+                else None
+            ),
+            "benchmark_monthly_comparisons": (
+                benchmark_comparison.personal_monthly_comparisons
+                if benchmark_comparison
+                else ()
+            ),
         }
