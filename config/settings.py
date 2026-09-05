@@ -27,6 +27,9 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
+INDIA_ENERGY_ATLAS_API_KEY = os.getenv("INDIA_ENERGY_ATLAS_API_KEY")
+INDIA_ENERGY_ATLAS_API_BASE_URL = "https://api.energymap.in/developer/v1"
+
 ALLOWED_HOSTS = []
 
 
@@ -53,6 +56,7 @@ INSTALLED_APPS = [
     'dashboard',
     'recommendations',
     "ml",
+    "external_data",
 ]
 
 MIDDLEWARE = [

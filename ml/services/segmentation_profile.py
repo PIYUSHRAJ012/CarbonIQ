@@ -13,7 +13,11 @@ from ml.services.model_persistence import (
     load_kmeans_metadata,
     load_kmeans_model,
 )
-from ml.services.segmentation import predict_user_segment
+from ml.services.segmentation import (
+    SegmentationPredictionError,
+    predict_user_segment,
+)
+from ml.services.feature_engineering import MLDataError
 
 
 class UserSegmentProfileError(Exception):
@@ -138,9 +142,15 @@ def get_user_segment_profile(
     for a CarbonIQ user.
     """
 
-    segmentation_result = predict_user_segment(
-        user_id
-    )
+    try:
+        segmentation_result = predict_user_segment(
+            user_id
+        )
+    except (MLDataError, SegmentationPredictionError) as exc:
+        raise UserSegmentProfileError(
+            "Unable to generate the user's segment profile: "
+            f"{exc}"
+        ) from exc
 
     try:
         bundle = load_kmeans_model()

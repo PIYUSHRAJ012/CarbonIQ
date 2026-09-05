@@ -1,5 +1,14 @@
 from analytics.services.aggregation import AnalyticsAggregationService
 from carbon.services.comparison import get_user_monthly_benchmark_comparison
+from ml.services.prediction import (
+    PredictionServiceError,
+    predict_next_month_carbon,
+)
+from ml.services.segmentation import SegmentationPredictionError
+from ml.services.segmentation_profile import (
+    UserSegmentProfileError,
+    get_user_segment_profile,
+)
 
 class DashboardService:
     """
@@ -29,6 +38,17 @@ class DashboardService:
             benchmark_comparison = get_user_monthly_benchmark_comparison(user)
         except ValueError:
             benchmark_comparison = None
+
+        # E2 Machine Learning
+        try:
+            carbon_prediction = predict_next_month_carbon(user.id)
+        except PredictionServiceError:
+            carbon_prediction = None
+
+        try:
+            user_segment = get_user_segment_profile(user.id)
+        except (UserSegmentProfileError, SegmentationPredictionError):
+            user_segment = None
 
         return {
             "total_emission": (
@@ -82,4 +102,7 @@ class DashboardService:
                 if benchmark_comparison
                 else ()
             ),
+                        # E2 Machine Learning
+            "carbon_prediction": carbon_prediction,
+            "user_segment": user_segment,
         }
