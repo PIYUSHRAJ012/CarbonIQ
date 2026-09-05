@@ -9,6 +9,8 @@ from ml.services.segmentation_profile import (
     UserSegmentProfileError,
     get_user_segment_profile,
 )
+from dashboard.services.insights.signals import InsightSignals
+from dashboard.services.insights.service import build_insights
 
 class DashboardService:
     """
@@ -50,6 +52,27 @@ class DashboardService:
         except (UserSegmentProfileError, SegmentationPredictionError):
             user_segment = None
 
+        insight_signals = InsightSignals(
+            current_total_emission=AnalyticsAggregationService.get_total_emission(user),
+            monthly_emissions=tuple(monthly_emissions),
+            weekly_emissions=tuple(weekly_emissions),
+            category_emissions=tuple(category_emissions),
+            top_category=(
+                category_emissions[0]["category__name"]
+                if category_emissions
+                else None
+            ),
+            top_category_emission=(
+                category_emissions[0]["total_emission"]
+                if category_emissions
+                else None
+            ),
+            prediction=carbon_prediction,
+            user_segment=user_segment,
+            benchmark=benchmark_comparison,
+        )
+
+        insights = build_insights(insight_signals)
         return {
             "total_emission": (
                 AnalyticsAggregationService.get_total_emission(user)
@@ -102,7 +125,9 @@ class DashboardService:
                 if benchmark_comparison
                 else ()
             ),
-                        # E2 Machine Learning
+            # E2 Machine Learning
             "carbon_prediction": carbon_prediction,
             "user_segment": user_segment,
+            # E7 Advanced Sustainability Insights
+            "insights": insights,
         }
