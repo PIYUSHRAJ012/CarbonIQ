@@ -8,6 +8,9 @@ from recommendations.services.actions import (
     mark_recommendation_completed,
 )
 
+from decimal import Decimal
+
+from gamification.models import Challenge, UserChallenge
 
 class RecommendationActionServiceTests(TestCase):
     def setUp(self):
@@ -62,6 +65,65 @@ class RecommendationActionServiceTests(TestCase):
         self.assertEqual(
             self.user_recommendation.status,
             UserRecommendation.Status.COMPLETED,
+        )
+
+    def test_completing_sustainability_recommendation_updates_active_challenge(self):
+        challenge = Challenge.objects.create(
+            code="SUSTAINABILITY_ACTION_CHALLENGE",
+            title="Complete Sustainability Actions",
+            description="Test challenge.",
+            metric=Challenge.Metric.SUSTAINABLE_ACTIONS,
+            target=Decimal("3"),
+            start_date="2026-09-01",
+            end_date="2026-12-31",
+            is_active=True,
+        )
+
+        user_challenge = UserChallenge.objects.create(
+            user=self.user,
+            challenge=challenge,
+        )
+
+        mark_recommendation_completed(
+            user=self.user,
+            recommendation_id=self.user_recommendation.id,
+        )
+
+        user_challenge.refresh_from_db()
+
+        self.assertEqual(
+            user_challenge.progress,
+            Decimal("1"),
+        )
+
+        self.assertFalse(
+            user_challenge.completed,
+        )
+
+    def test_completing_sustainability_recommendation_evaluates_achievements(self):
+        from gamification.models import Achievement, UserAchievement
+
+        achievement = Achievement.objects.create(
+            code="SUSTAINABILITY_ACTION_CHAMPION",
+            name="Sustainability Action Champion",
+            description=(
+                "Complete at least three personalized sustainability "
+                "recommendations."
+            ),
+            icon="fa-seedling",
+            is_active=True,
+        )
+
+        mark_recommendation_completed(
+            user=self.user,
+            recommendation_id=self.user_recommendation.id,
+        )
+
+        self.assertFalse(
+            UserAchievement.objects.filter(
+                user=self.user,
+                achievement=achievement,
+            ).exists()
         )
 
     def test_active_recommendation_can_be_dismissed(self):

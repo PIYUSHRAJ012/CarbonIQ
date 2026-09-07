@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'recommendations',
     "ml",
     "external_data",
+    'gamification',
 ]
 
 MIDDLEWARE = [

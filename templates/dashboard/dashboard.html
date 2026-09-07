@@ -289,7 +289,366 @@
             {% endif %}
         </div>
     </div>
+    <!-- E8 Gamification & Engagement -->
+    <section class="mt-5" id="gamification-section">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h2 class="h4 mb-1">
+                    <i class="bi bi-trophy me-2"></i>
+                    Sustainability Progress
+                </h2>
+                <p class="text-muted mb-0">
+                    Track your Eco Score, achievements, and sustainability challenges.
+                </p>
+            </div>
+        </div>
 
+        <!-- Eco Score -->
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-lg-4 text-center">
+                        <div class="mb-2">
+                            <span class="text-muted small text-uppercase">
+                                Eco Score
+                            </span>
+                        </div>
+
+                        <div class="display-4 fw-bold text-success">
+                            {{ gamification.eco_score.overall_score }}
+                        </div>
+
+                        <div class="text-muted">
+                            out of 100
+                        </div>
+                    </div>
+
+                    <div class="col-lg-8 mt-4 mt-lg-0">
+                        <h3 class="h6 mb-3">
+                            Score Breakdown
+                        </h3>
+
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Emission Performance</span>
+                                <span class="fw-semibold">
+                                    {{ gamification.eco_score.emission_performance }}
+                                </span>
+                            </div>
+
+                            <div class="progress" role="progressbar"
+                                aria-valuenow="{{ gamification.eco_score.emission_performance }}"
+                                aria-valuemin="0"
+                                aria-valuemax="100">
+                                <div class="progress-bar"
+                                    style="width: {{ gamification.eco_score.emission_performance }}%;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Improvement Trend</span>
+                                <span class="fw-semibold">
+                                    {{ gamification.eco_score.improvement_trend }}
+                                </span>
+                            </div>
+
+                            <div class="progress" role="progressbar"
+                                aria-valuenow="{{ gamification.eco_score.improvement_trend }}"
+                                aria-valuemin="0"
+                                aria-valuemax="100">
+                                <div class="progress-bar"
+                                    style="width: {{ gamification.eco_score.improvement_trend }}%;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Sustainable Behaviour</span>
+                                <span class="fw-semibold">
+                                    {{ gamification.eco_score.sustainable_behaviour }}
+                                </span>
+                            </div>
+
+                            <div class="progress" role="progressbar"
+                                aria-valuenow="{{ gamification.eco_score.sustainable_behaviour }}"
+                                aria-valuemin="0"
+                                aria-valuemax="100">
+                                <div class="progress-bar"
+                                    style="width: {{ gamification.eco_score.sustainable_behaviour }}%;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Engagement &amp; Progress</span>
+                                <span class="fw-semibold">
+                                    {{ gamification.eco_score.engagement_progress }}
+                                </span>
+                            </div>
+
+                            <div class="progress" role="progressbar"
+                                aria-valuenow="{{ gamification.eco_score.engagement_progress }}"
+                                aria-valuemin="0"
+                                aria-valuemax="100">
+                                <div class="progress-bar"
+                                    style="width: {{ gamification.eco_score.engagement_progress }}%;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Achievements -->
+        <div class="row g-4 mb-4">
+            <div class="col-lg-6">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h3 class="h5 mb-0">
+                                <i class="bi bi-award me-2"></i>
+                                Achievements
+                            </h3>
+
+                            <span class="badge bg-success-subtle text-success">
+                                {{ gamification.earned_achievements|length }} earned
+                            </span>
+                        </div>
+
+                        {% if gamification.earned_achievements %}
+                            <div class="row g-3">
+                                {% for user_achievement in gamification.earned_achievements %}
+                                    <div class="col-md-6">
+                                        <div class="border rounded p-3 h-100">
+                                            <div class="d-flex align-items-center">
+                                                {% if user_achievement.achievement.icon %}
+                                                    <div class="me-3 fs-4">
+                                                        <i class="bi {{ user_achievement.achievement.icon }}"></i>
+                                                    </div>
+                                                {% endif %}
+
+                                                <div>
+                                                    <div class="fw-semibold">
+                                                        {{ user_achievement.achievement.name }}
+                                                    </div>
+
+                                                    <div class="small text-muted">
+                                                        {{ user_achievement.achievement.description }}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="small text-muted mt-2">
+                                                Earned {{ user_achievement.earned_at|date:"d M Y" }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center py-4">
+                                <div class="fs-2 mb-2">🏆</div>
+                                <p class="mb-1 fw-semibold">
+                                    No achievements yet
+                                </p>
+                                <p class="text-muted small mb-0">
+                                    Keep tracking your footprint and completing
+                                    sustainability actions to earn your first achievement.
+                                </p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Challenges -->
+            <div class="col-lg-6">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h3 class="h5 mb-0">
+                                <i class="bi bi-bullseye me-2"></i>
+                                Active Challenges
+                            </h3>
+
+                            <span class="badge bg-primary-subtle text-primary">
+                                {{ gamification.active_challenges|length }} active
+                            </span>
+                        </div>
+
+                        {% if gamification.active_challenges %}
+                            {% for user_challenge in gamification.active_challenges %}
+                                <div class="border rounded p-3 mb-3 last-child-no-margin">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div>
+                                            <div class="fw-semibold">
+                                                {{ user_challenge.challenge.title }}
+                                            </div>
+
+                                            <div class="small text-muted">
+                                                {{ user_challenge.challenge.description }}
+                                            </div>
+                                        </div>
+
+                                        <span class="badge bg-light text-dark">
+                                            {{ user_challenge.progress }}
+                                            /
+                                            {{ user_challenge.challenge.target }}
+                                        </span>
+                                    </div>
+
+                                    {% widthratio user_challenge.progress user_challenge.challenge.target 100 as challenge_percent %}
+
+                                    <div class="progress mb-2"
+                                        role="progressbar"
+                                        aria-valuenow="{{ challenge_percent }}"
+                                        aria-valuemin="0"
+                                        aria-valuemax="100">
+                                        <div class="progress-bar"
+                                            style="width: {{ challenge_percent }}%;">
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between small text-muted">
+                                        <span>
+                                            {{ user_challenge.challenge.get_metric_display }}
+                                        </span>
+
+                                        <span>
+                                            Ends {{ user_challenge.challenge.end_date|date:"d M Y" }}
+                                        </span>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center py-4">
+                                <div class="fs-2 mb-2">🎯</div>
+
+                                <p class="mb-1 fw-semibold">
+                                    No active challenges
+                                </p>
+
+                                <p class="text-muted small mb-0">
+                                    Join an available sustainability challenge to start
+                                    tracking your progress.
+                                </p>
+                            </div>
+
+                            {% if gamification.available_challenges %}
+                                <div class="mt-4">
+                                    <h6 class="fw-bold mb-3">
+                                        Available Challenges
+                                    </h6>
+
+                                    <div class="d-flex flex-column gap-3">
+                                        {% for challenge in gamification.available_challenges %}
+                                            <div class="border rounded p-3">
+                                                <div class="d-flex justify-content-between align-items-start gap-3">
+                                                    <div>
+                                                        <div class="fw-semibold">
+                                                            {{ challenge.title }}
+                                                        </div>
+
+                                                        <div class="small text-muted mt-1">
+                                                            {{ challenge.description }}
+                                                        </div>
+
+                                                        <div class="small text-muted mt-2">
+                                                            Target:
+                                                            {{ challenge.target|floatformat:0 }}
+                                                            {{ challenge.get_metric_display }}
+                                                        </div>
+
+                                                        <div class="small text-muted">
+                                                            Ends {{ challenge.end_date|date:"d M Y" }}
+                                                        </div>
+                                                    </div>
+
+                                                    <form
+                                                        method="post"
+                                                        action="{% url 'gamification:join_challenge' challenge.id %}"
+                                                    >
+                                                        {% csrf_token %}
+
+                                                        <button
+                                                            type="submit"
+                                                            class="btn btn-primary btn-sm"
+                                                        >
+                                                            Join Challenge
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Completed Challenges -->
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="h5 mb-0">
+                        <i class="bi bi-check2-circle me-2"></i>
+                        Completed Challenges
+                    </h3>
+
+                    <span class="badge bg-success-subtle text-success">
+                        {{ gamification.completed_challenges|length }} completed
+                    </span>
+                </div>
+
+                {% if gamification.completed_challenges %}
+                    <div class="row g-3">
+                        {% for user_challenge in gamification.completed_challenges %}
+                            <div class="col-md-6 col-xl-4">
+                                <div class="border rounded p-3 h-100">
+                                    <div class="d-flex align-items-start">
+                                        <div class="fs-4 me-3 text-success">
+                                            <i class="bi bi-check-circle-fill"></i>
+                                        </div>
+
+                                        <div>
+                                            <div class="fw-semibold">
+                                                {{ user_challenge.challenge.title }}
+                                            </div>
+
+                                            {% if user_challenge.completed_at %}
+                                                <div class="small text-muted mt-1">
+                                                    Completed
+                                                    {{ user_challenge.completed_at|date:"d M Y" }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <div class="fs-2 mb-2">🌱</div>
+                        <p class="mb-1 fw-semibold">
+                            No completed challenges yet
+                        </p>
+                        <p class="text-muted small mb-0">
+                            Your completed challenges will appear here.
+                        </p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
     <!-- Carbon Benchmark -->
     <div class="row g-4 mb-4">
 

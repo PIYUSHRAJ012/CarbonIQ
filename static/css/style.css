@@ -5,3 +5,17 @@ body {
 main {
     min-height: 80vh;
 }
+
+/* E8 Gamification */
+
+#gamification-section .progress {
+    height: 8px;
+}
+
+#gamification-section .card {
+    border-radius: 0.75rem;
+}
+
+#gamification-section .last-child-no-margin:last-child {
+    margin-bottom: 0 !important;
+}

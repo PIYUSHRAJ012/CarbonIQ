@@ -11,6 +11,7 @@ from ml.services.segmentation_profile import (
 )
 from dashboard.services.insights.signals import InsightSignals
 from dashboard.services.insights.service import build_insights
+from gamification.services.engagement import build_engagement_snapshot
 
 class DashboardService:
     """
@@ -73,6 +74,10 @@ class DashboardService:
         )
 
         insights = build_insights(insight_signals)
+
+        # E8 Gamification & Engagement
+        gamification = build_engagement_snapshot(user)
+
         return {
             "total_emission": (
                 AnalyticsAggregationService.get_total_emission(user)
@@ -128,6 +133,10 @@ class DashboardService:
             # E2 Machine Learning
             "carbon_prediction": carbon_prediction,
             "user_segment": user_segment,
+
             # E7 Advanced Sustainability Insights
             "insights": insights,
+
+            # E8 Gamification & Engagement
+            "gamification": gamification,
         }

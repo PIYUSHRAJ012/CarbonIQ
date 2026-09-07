@@ -7,6 +7,7 @@ from carbon.models import CarbonActivity, CarbonFootprint
 from carbon.services.calculator import CarbonCalculationService
 from carbon.services.emission import EmissionFactorService
 
+from gamification.services.achievements import evaluate_achievements
 
 class CarbonFootprintService:
     """
@@ -109,6 +110,10 @@ class CarbonFootprintService:
         carbon_activity.status = CarbonActivity.Status.COMPLETED
         carbon_activity.save(
             update_fields=["status", "updated_at"]
+        )
+
+        evaluate_achievements(
+            carbon_activity.user
         )
 
         return footprint

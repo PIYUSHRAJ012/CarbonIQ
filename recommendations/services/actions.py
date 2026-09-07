@@ -2,8 +2,13 @@ from __future__ import annotations
 
 from django.db import transaction
 
-from recommendations.models import UserRecommendation
+from recommendations.models import Recommendation, UserRecommendation
 
+from gamification.models import UserChallenge
+from gamification.services.challenges import update_challenge_progress
+from gamification.services.achievements import evaluate_achievements
+
+from django.utils import timezone
 
 class RecommendationActionError(Exception):
     """Raised when a recommendation action cannot be completed."""
@@ -47,6 +52,25 @@ def mark_recommendation_completed(
     recommendation.save(
         update_fields=["status"]
     )
+
+    if recommendation.recommendation.action_type == (
+        Recommendation.ActionType.SUSTAINABILITY
+    ):
+        active_challenges = (
+            UserChallenge.objects
+            .filter(
+                user=user,
+                challenge__is_active=True,
+                challenge__start_date__lte=timezone.localdate(),
+                challenge__end_date__gte=timezone.localdate(),
+                completed=False,
+            )
+            .select_related("challenge")
+        )
+
+        for user_challenge in active_challenges:
+            update_challenge_progress(user_challenge)
+        evaluate_achievements(user)
 
     return recommendation
 

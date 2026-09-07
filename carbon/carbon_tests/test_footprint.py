@@ -108,6 +108,24 @@ class CarbonFootprintServiceTests(TestCase):
             CarbonActivity.Status.COMPLETED,
         )
 
+    def test_completed_footprint_evaluates_achievements(self):
+        activity = self.create_activity_with_entries()
+
+        CarbonFootprintService.calculate_footprint(activity)
+
+        from gamification.models import Achievement, UserAchievement
+
+        first_footprint = Achievement.objects.get(
+            code="FIRST_FOOTPRINT"
+        )
+
+        self.assertTrue(
+            UserAchievement.objects.filter(
+                user=self.user,
+                achievement=first_footprint,
+            ).exists()
+        )
+
     def test_stores_emission_factor_snapshots(self):
         activity = self.create_activity_with_entries()
 

@@ -17,4 +17,9 @@ urlpatterns = [
         include("recommendations.urls"),
     ),
     
+    path(
+        "gamification/",
+        include("gamification.urls"),
+    ),
+    
 ]
