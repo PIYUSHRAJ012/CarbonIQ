@@ -1,5 +1,5 @@
 from decimal import Decimal
-
+from unittest.mock import patch
 from django.core.exceptions import ValidationError
 from django.core.management import call_command
 from django.test import TestCase
@@ -144,3 +144,65 @@ class CarbonSubmissionServiceTests(TestCase):
             CarbonActivity.objects.count(),
             initial_count,
         )
+
+    @patch(
+        "carbon.services.submission.refresh_user_recommendations"
+    )
+    def test_successful_submission_schedules_recommendation_refresh(
+        self,
+        refresh_user_recommendations,
+    ):
+        entries_data = [
+            {
+                "category": self.electricity,
+                "quantity": Decimal("100.00"),
+            },
+        ]
+
+        with self.captureOnCommitCallbacks(
+            execute=True
+        ):
+            activity = CarbonSubmissionService.create_submission(
+                user=self.user,
+                entries_data=entries_data,
+            )
+
+        activity.refresh_from_db()
+
+        self.assertEqual(
+            activity.status,
+            CarbonActivity.Status.COMPLETED,
+        )
+
+        refresh_user_recommendations.assert_called_once_with(
+            self.user
+        )
+
+    @patch(
+        "carbon.services.submission.refresh_user_recommendations"
+    )
+    def test_failed_submission_does_not_refresh_recommendations(
+        self,
+        refresh_user_recommendations,
+    ):
+        entries_data = [
+            {
+                "category": self.electricity,
+                "quantity": Decimal("100.00"),
+            },
+            {
+                "category": self.no_factor_category,
+                "quantity": Decimal("50.00"),
+            },
+        ]
+
+        with self.assertRaises(Exception):
+            with self.captureOnCommitCallbacks(
+                execute=True
+            ):
+                CarbonSubmissionService.create_submission(
+                    user=self.user,
+                    entries_data=entries_data,
+                )
+
+        refresh_user_recommendations.assert_not_called()

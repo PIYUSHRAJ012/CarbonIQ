@@ -11,6 +11,7 @@ from recommendations.services.offset_scoring import (
     calculate_geography_score,
     calculate_offset_project_score,
     calculate_offset_requirement,
+    calculate_project_type_score,
     rank_offset_projects,
 )
 from recommendations.services.signals import RecommendationSignals
@@ -241,7 +242,7 @@ class OffsetScoringTests(TestCase):
 
         self.assertEqual(
             score,
-            Decimal("100"),
+            Decimal("75"),
         )
 
     def test_unmatched_project_domain_gets_lower_score(self):
@@ -291,7 +292,108 @@ class OffsetScoringTests(TestCase):
             score,
             Decimal("50"),
         )
+    # -------------------------------------------------------------
+    # Project-type scoring
+    # -------------------------------------------------------------
 
+    def test_direct_project_type_match_gets_full_score(self):
+        project = OffsetProject.objects.create(
+            name="India Solar PV Project",
+            description="Solar photovoltaic electricity project.",
+            project_type="PV",
+            country="India",
+            region="",
+            registry="Gold Standard",
+            registry_project_id="GS-OFFSET-004",
+            registry_url=(
+                "https://registry.goldstandard.org/"
+                "projects/details/offset-004"
+            ),
+            standard="",
+            status=OffsetProject.ProjectStatus.ACTIVE,
+            project_scale="Large",
+            annual_estimated_credits=Decimal(
+                "10000.00"
+            ),
+            sdg_impacts=[
+                {"sdg": 13},
+            ],
+            project_developer="Example Solar Ltd.",
+            certification_documents_url="",
+            source_last_verified_at=timezone.now(),
+            is_active=True,
+        )
+
+        electricity_only_signals = RecommendationSignals(
+            total_emission=Decimal("1500.0000"),
+            category_emissions=(
+                {
+                    "category__name": "Electricity",
+                    "total_emission": Decimal("1500.0000"),
+                },
+            ),
+            monthly_emissions=self.signals.monthly_emissions,
+            weekly_emissions=self.signals.weekly_emissions,
+            top_category="Electricity",
+            top_category_emission=Decimal("1500.0000"),
+            dominant_domain=None,
+        )
+
+        score = calculate_project_type_score(
+            project,
+            electricity_only_signals,
+        )
+
+        self.assertEqual(
+            score,
+            Decimal("100"),
+        )
+
+    def test_unrelated_project_type_gets_lower_score(self):
+        score = calculate_project_type_score(
+            self.foreign_project,
+            self.signals,
+        )
+
+        self.assertEqual(
+            score,
+            Decimal("25"),
+        )
+
+    def test_unknown_project_type_gets_neutral_score(self):
+        project = OffsetProject.objects.create(
+            name="Generic Offset Project",
+            project_type="Other",
+            country="India",
+            region="",
+            registry="Gold Standard",
+            registry_project_id="GS-OFFSET-005",
+            registry_url=(
+                "https://registry.goldstandard.org/"
+                "projects/details/offset-005"
+            ),
+            standard="",
+            status=OffsetProject.ProjectStatus.ACTIVE,
+            project_scale="Medium",
+            annual_estimated_credits=Decimal(
+                "5000.00"
+            ),
+            sdg_impacts=[],
+            project_developer="Example Developer",
+            certification_documents_url="",
+            source_last_verified_at=timezone.now(),
+            is_active=True,
+        )
+
+        score = calculate_project_type_score(
+            project,
+            self.signals,
+        )
+
+        self.assertEqual(
+            score,
+            Decimal("50"),
+        )
     # -------------------------------------------------------------
     # Geography scoring
     # -------------------------------------------------------------
@@ -433,6 +535,53 @@ class OffsetScoringTests(TestCase):
             foreign_result.score,
         )
 
+    def test_direct_project_type_match_outscores_text_only_match(self):
+        text_match = calculate_offset_project_score(
+            self.india_project,
+            self.signals,
+            self.user,
+        )
+
+        direct_match_project = OffsetProject.objects.create(
+            name="India PV Renewable Electricity Project",
+            description=(
+                "Solar photovoltaic renewable electricity "
+                "project generating clean electricity."
+            ),
+            project_type="PV",
+            country="India",
+            region="",
+            registry="Gold Standard",
+            registry_project_id="GS-OFFSET-006",
+            registry_url=(
+                "https://registry.goldstandard.org/"
+                "projects/details/offset-006"
+            ),
+            standard="",
+            status=OffsetProject.ProjectStatus.ACTIVE,
+            project_scale="Large",
+            annual_estimated_credits=Decimal(
+                "10000.00"
+            ),
+            sdg_impacts=[
+                {"sdg": 13},
+            ],
+            project_developer="Example Solar Ltd.",
+            certification_documents_url="",
+            source_last_verified_at=timezone.now(),
+            is_active=True,
+        )
+
+        direct_match = calculate_offset_project_score(
+            direct_match_project,
+            self.signals,
+            self.user,
+        )
+
+        self.assertGreater(
+            direct_match.score,
+            text_match.score,
+        )
     # -------------------------------------------------------------
     # Ranking
     # -------------------------------------------------------------
@@ -511,4 +660,77 @@ class OffsetScoringTests(TestCase):
 
         self.assertFalse(
             results[1].applicable
+        )
+
+    def test_project_type_score_uses_full_category_distribution(self):
+        score = calculate_project_type_score(
+            self.india_project,
+            self.signals,
+        )
+
+        # Electricity is the dominant category, but the user's
+        # other categories must also influence the score.
+        self.assertLess(
+            score,
+            Decimal("100"),
+        )
+
+
+    def test_project_type_score_uses_category_emission_distribution(self):
+        mixed_signals = RecommendationSignals(
+            total_emission=Decimal("2500.0000"),
+            category_emissions=(
+                {
+                    "category__name": "Electricity",
+                    "total_emission": Decimal("800.0000"),
+                },
+                {
+                    "category__name": "Transportation",
+                    "total_emission": Decimal("1200.0000"),
+                },
+            ),
+            monthly_emissions=self.signals.monthly_emissions,
+            weekly_emissions=self.signals.weekly_emissions,
+            top_category="Transportation",
+            top_category_emission=Decimal("1200.0000"),
+            dominant_domain=None,
+        )
+
+        transport_project = OffsetProject.objects.create(
+            name="India Transport Efficiency Project",
+            description=(
+                "Transport energy efficiency project."
+            ),
+            project_type="Energy Efficiency - Transport Sector",
+            country="India",
+            region="",
+            registry="Gold Standard",
+            registry_project_id="GS-OFFSET-007",
+            registry_url=(
+                "https://registry.goldstandard.org/"
+                "projects/details/offset-007"
+            ),
+            standard="",
+            status=OffsetProject.ProjectStatus.ACTIVE,
+            project_scale="Large",
+            annual_estimated_credits=Decimal(
+                "10000.00"
+            ),
+            sdg_impacts=[
+                {"sdg": 13},
+            ],
+            project_developer="Example Transport Ltd.",
+            certification_documents_url="",
+            source_last_verified_at=timezone.now(),
+            is_active=True,
+        )
+
+        score = calculate_project_type_score(
+            transport_project,
+            mixed_signals,
+        )
+
+        self.assertEqual(
+            score,
+            Decimal("70.0000"),
         )

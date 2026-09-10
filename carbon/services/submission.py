@@ -6,6 +6,9 @@ from carbon.services.calculator import CarbonCalculationService
 from carbon.services.emission import EmissionFactorService
 from carbon.services.footprint import CarbonFootprintService
 
+from recommendations.services.integration import (
+    refresh_user_recommendations,
+)
 
 class CarbonSubmissionService:
     """
@@ -97,6 +100,12 @@ class CarbonSubmissionService:
 
         CarbonFootprintService.calculate_footprint(
             carbon_activity
+        )
+
+        transaction.on_commit(
+            lambda: refresh_user_recommendations(
+                carbon_activity.user
+            )
         )
 
         return carbon_activity

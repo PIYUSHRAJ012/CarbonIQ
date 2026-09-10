@@ -20,12 +20,11 @@ KG_PER_TONNE = Decimal("1000")
 # Total = 100%
 # ---------------------------------------------------------------------
 
-DOMAIN_WEIGHT = Decimal("0.30")
-GEOGRAPHY_WEIGHT = Decimal("0.25")
-SDG_WEIGHT = Decimal("0.20")
-PROJECT_TYPE_WEIGHT = Decimal("0.15")
+DOMAIN_WEIGHT = Decimal("0.40")
+GEOGRAPHY_WEIGHT = Decimal("0.15")
+SDG_WEIGHT = Decimal("0.15")
+PROJECT_TYPE_WEIGHT = Decimal("0.20")
 QUALITY_WEIGHT = Decimal("0.10")
-
 
 # ---------------------------------------------------------------------
 # CarbonIQ category -> broad sustainability domain
@@ -113,6 +112,104 @@ PROJECT_DOMAIN_KEYWORDS: dict[str, tuple[str, ...]] = {
     ),
 }
 
+# ---------------------------------------------------------------------
+# Explicit Gold Standard project-type -> sustainability domains
+#
+# These mappings are used only for recommendation ranking.
+# They do not alter the source registry classification.
+# ---------------------------------------------------------------------
+
+PROJECT_TYPE_DOMAIN_KEYWORDS: dict[str, tuple[str, ...]] = {
+    "energy": (
+        "energy efficiency - domestic",
+        "energy efficiency - industrial",
+        "energy efficiency - commercial sector",
+        "energy efficiency - public sector",
+        "wind",
+        "solar thermal - electricity",
+        "solar thermal - heat",
+        "small, low - impact hydro",
+        "pv",
+        "geothermal",
+        "biogas - heat",
+        "biogas - electricity",
+        "biogas - cogeneration",
+        "biomass, or liquid biofuel - heat",
+        "biomass, or liquid biofuel - electricity",
+        "biomass, or liquid biofuel - cogeneration",
+    ),
+    "transport": (
+        "energy efficiency - transport sector",
+    ),
+    "food": (
+        "energy efficiency - agriculture sector",
+    ),
+    "nature": (
+        "a/r",
+    ),
+    "waste": (
+        "biogas - heat",
+        "biogas - electricity",
+        "biogas - cogeneration",
+    ),
+}
+
+# ---------------------------------------------------------------------
+# CarbonIQ category -> specific Gold Standard project types
+#
+# This mapping provides finer-grained personalization than the broad
+# sustainability-domain mapping.
+#
+# Only project types actually present in the imported Gold Standard
+# registry dataset are included.
+# ---------------------------------------------------------------------
+
+CATEGORY_PROJECT_TYPE_RELEVANCE: dict[str, tuple[str, ...]] = {
+    "Electricity": (
+        "PV",
+        "Solar Thermal - Electricity",
+        "Wind",
+        "Small, Low - Impact Hydro",
+        "Geothermal",
+        "Biogas - Electricity",
+        "Biomass, or Liquid Biofuel - Electricity",
+    ),
+    "Transportation": (
+        "Energy Efficiency - Transport Sector",
+    ),
+    "Petrol": (
+        "Energy Efficiency - Transport Sector",
+    ),
+    "Diesel": (
+        "Energy Efficiency - Transport Sector",
+    ),
+    "Rice & Grain": (
+        "Energy Efficiency - Agriculture Sector",
+    ),
+    "Legumes": (
+        "Energy Efficiency - Agriculture Sector",
+    ),
+    "Milk": (
+        "Energy Efficiency - Agriculture Sector",
+    ),
+    "Tofu": (
+        "Energy Efficiency - Agriculture Sector",
+    ),
+    "Fruit": (
+        "Energy Efficiency - Agriculture Sector",
+    ),
+    "Vegetables": (
+        "Energy Efficiency - Agriculture Sector",
+    ),
+    "Waste": (
+        "Biogas - Heat",
+        "Biogas - Electricity",
+        "Biogas - Cogeneration",
+        "Biomass, or Liquid Biofuel - Heat",
+        "Biomass, or Liquid Biofuel - Electricity",
+        "Biomass, or Liquid Biofuel - Cogeneration",
+    ),
+}
 
 @dataclass(frozen=True)
 class OffsetRequirement:
@@ -242,14 +339,61 @@ def _get_user_domain(
     return None
 
 
-def _get_project_domains(
+def _normalise_text(
+    value: str | None,
+) -> str:
+    """
+    Normalize text for deterministic matching.
+    """
+    if not value:
+        return ""
+
+    return " ".join(
+        str(value).strip().casefold().split()
+    )
+
+
+def _get_project_type_domains(
     project: OffsetProject,
 ) -> set[str]:
     """
-    Determine broad semantic domains for an offset project.
+    Determine sustainability domains from the explicit
+    Gold Standard project type.
 
-    The matching is based on source-provided project text and does
-    not overwrite the project's original registry classification.
+    Explicit registry classification is treated as stronger
+    evidence than free-text description matching.
+    """
+
+    project_type = _normalise_text(
+        project.project_type
+    )
+
+    if not project_type:
+        return set()
+
+    matched_domains: set[str] = set()
+
+    for domain, project_types in (
+        PROJECT_TYPE_DOMAIN_KEYWORDS.items()
+    ):
+        if any(
+            project_type == candidate
+            or candidate in project_type
+            for candidate in project_types
+        ):
+            matched_domains.add(domain)
+
+    return matched_domains
+
+
+def _get_project_text_domains(
+    project: OffsetProject,
+) -> set[str]:
+    """
+    Determine supporting sustainability domains from project text.
+
+    Free-text matching is secondary to explicit project-type
+    classification.
     """
 
     searchable_text = " ".join(
@@ -258,18 +402,70 @@ def _get_project_domains(
             project.description or "",
             project.project_type or "",
         )
-    ).lower()
+    ).casefold()
 
     matched_domains: set[str] = set()
 
     for domain, keywords in PROJECT_DOMAIN_KEYWORDS.items():
         if any(
-            keyword in searchable_text
+            keyword.casefold() in searchable_text
             for keyword in keywords
         ):
             matched_domains.add(domain)
 
     return matched_domains
+
+
+def _get_project_domains(
+    project: OffsetProject,
+) -> set[str]:
+    """
+    Determine broad sustainability domains for an offset project.
+
+    Explicit registry project type is preferred. Free-text
+    matching is used only when project-type classification
+    is unavailable.
+    """
+
+    explicit_domains = _get_project_type_domains(
+        project
+    )
+
+    if explicit_domains:
+        return explicit_domains
+
+    return _get_project_text_domains(
+        project
+    )
+
+
+def _count_domain_supporting_keywords(
+    project: OffsetProject,
+    user_domain: str,
+) -> int:
+    """
+    Count distinct source-text keywords supporting the user's
+    dominant sustainability domain.
+    """
+
+    searchable_text = " ".join(
+        (
+            project.name or "",
+            project.description or "",
+            project.project_type or "",
+        )
+    ).casefold()
+
+    keywords = PROJECT_DOMAIN_KEYWORDS.get(
+        user_domain,
+        (),
+    )
+
+    return sum(
+        1
+        for keyword in keywords
+        if keyword.casefold() in searchable_text
+    )
 
 
 def calculate_domain_score(
@@ -280,8 +476,10 @@ def calculate_domain_score(
     Score project alignment with the user's dominant domain.
 
     Scoring:
-        100 -> exact domain match
-         25 -> project has a known but different domain
+        100 -> explicit project-type match with strong supporting evidence
+         80 -> explicit project-type match
+         60-75 -> text-only domain match
+         25 -> known but different domain
          50 -> insufficient information
     """
 
@@ -289,20 +487,55 @@ def calculate_domain_score(
         signals
     )
 
-    project_domains = _get_project_domains(
-        project
-    )
-
     if user_domain is None:
         return Decimal("50")
 
-    if not project_domains:
-        return Decimal("50")
+    explicit_domains = _get_project_type_domains(
+        project
+    )
 
-    if user_domain in project_domains:
-        return Decimal("100")
+    text_domains = _get_project_text_domains(
+        project
+    )
 
-    return Decimal("25")
+    # Strongest evidence: explicit registry classification.
+    if user_domain in explicit_domains:
+        supporting_keywords = min(
+            _count_domain_supporting_keywords(
+                project,
+                user_domain,
+            ),
+            4,
+        )
+
+        return (
+            Decimal("80")
+            + Decimal(supporting_keywords)
+            * Decimal("5")
+        )
+
+    # Secondary evidence: project text only.
+    if user_domain in text_domains:
+        supporting_keywords = min(
+            _count_domain_supporting_keywords(
+                project,
+                user_domain,
+            ),
+            3,
+        )
+
+        return (
+            Decimal("60")
+            + Decimal(supporting_keywords)
+            * Decimal("5")
+        )
+
+    # A known sustainability domain exists, but it does not
+    # match the user's dominant domain.
+    if explicit_domains or text_domains:
+        return Decimal("25")
+
+    return Decimal("50")
 
 
 def _get_user_country(
@@ -399,26 +632,132 @@ def calculate_sdg_score(
 
     return Decimal("40")
 
+def _score_project_type_for_category(
+    project: OffsetProject,
+    category: str,
+) -> Decimal:
+    """
+    Score a project type against one user's emission category.
+
+    Scoring:
+        100 -> direct project-type match
+         70 -> broader sustainability-domain match
+         25 -> known but unrelated project type
+         50 -> insufficient information
+    """
+
+    project_type = _normalise_text(
+        project.project_type
+    )
+
+    if not project_type or project_type == "other":
+        return Decimal("50")
+
+    specific_project_types = {
+        _normalise_text(value)
+        for value in CATEGORY_PROJECT_TYPE_RELEVANCE.get(
+            category,
+            (),
+        )
+    }
+
+    if project_type in specific_project_types:
+        return Decimal("100")
+
+    category_domain = CATEGORY_DOMAIN_MAP.get(
+        category
+    )
+
+    if category_domain is None:
+        return Decimal("50")
+
+    project_domains = _get_project_type_domains(
+        project
+    )
+
+    if not project_domains:
+        return Decimal("50")
+
+    if category_domain in project_domains:
+        return Decimal("70")
+
+    return Decimal("25")
+
 
 def calculate_project_type_score(
     project: OffsetProject,
+    signals: RecommendationSignals,
 ) -> Decimal:
     """
-    Score project-type metadata availability.
+    Score project-type alignment against the user's complete
+    emission-category distribution.
 
-    This measures classification usefulness, not environmental
-    quality or certification quality.
+    Each category contributes according to its share of the
+    user's total categorized emissions.
+
+    This avoids treating the user as belonging exclusively to
+    the single highest-emission category.
     """
 
-    project_type = (
-        project.project_type or ""
-    ).strip()
+    category_emissions = signals.category_emissions
 
-    if not project_type:
+    if not category_emissions:
+        if signals.top_category:
+            return _score_project_type_for_category(
+                project,
+                signals.top_category,
+            )
+
         return Decimal("50")
 
-    return Decimal("100")
+    positive_categories = []
 
+    for row in category_emissions:
+        category = row.get("category__name")
+        emission = Decimal(
+            str(
+                row.get(
+                    "total_emission",
+                    Decimal("0"),
+                )
+            )
+        )
+
+        if (
+            category
+            and emission > Decimal("0")
+        ):
+            positive_categories.append(
+                (str(category), emission)
+            )
+
+    if not positive_categories:
+        return Decimal("50")
+
+    total_emission = sum(
+        emission
+        for _, emission in positive_categories
+    )
+
+    if total_emission <= Decimal("0"):
+        return Decimal("50")
+
+    weighted_score = sum(
+        (
+            _score_project_type_for_category(
+                project,
+                category,
+            )
+            * emission
+        )
+        for category, emission in positive_categories
+    ) / total_emission
+
+    return _clamp(
+        weighted_score
+    ).quantize(
+        Decimal("0.0001")
+    )
 
 def calculate_quality_score(
     project: OffsetProject,
@@ -502,7 +841,8 @@ def calculate_offset_project_score(
 
     project_type_score = (
         calculate_project_type_score(
-            project
+            project,
+            signals,
         )
     )
 

@@ -6,6 +6,10 @@ from .engine import (
     RecommendationEngineError,
     generate_user_recommendations,
 )
+from .offset_recommendations import (
+    OffsetRecommendationError,
+    generate_offset_recommendations,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -13,33 +17,62 @@ logger = logging.getLogger(__name__)
 
 def refresh_user_recommendations(user) -> bool:
     """
-    Refresh personalized recommendations for a user.
+    Refresh personalized CarbonIQ recommendations for a user.
 
-    Recommendation generation is a downstream enhancement of the
-    core CarbonIQ carbon-calculation workflow. A recommendation failure
-    must therefore never cause an otherwise successful carbon
-    submission to fail.
+    This downstream operation includes:
+        1. Generic sustainability/action recommendations.
+        2. Registry-backed offset project recommendations.
+
+    Recommendation failures must never cause an otherwise successful
+    carbon submission to fail.
 
     Returns:
-        True  -> recommendation generation succeeded
-        False -> recommendation generation failed
+        True  -> all recommendation generation steps succeeded.
+        False -> one or more recommendation generation steps failed.
     """
+
+    success = True
 
     try:
         generate_user_recommendations(user)
-        return True
 
     except RecommendationEngineError:
-        logger.exception(
-            "Recommendation generation failed for user_id=%s.",
-            user.id,
-        )
-        return False
+        success = False
 
-    except Exception:
         logger.exception(
-            "Unexpected recommendation integration error "
+            "Sustainability recommendation generation failed "
             "for user_id=%s.",
             user.id,
         )
-        return False
+
+    except Exception:
+        success = False
+
+        logger.exception(
+            "Unexpected sustainability recommendation integration "
+            "error for user_id=%s.",
+            user.id,
+        )
+
+    try:
+        generate_offset_recommendations(user)
+
+    except OffsetRecommendationError:
+        success = False
+
+        logger.exception(
+            "Offset recommendation generation failed "
+            "for user_id=%s.",
+            user.id,
+        )
+
+    except Exception:
+        success = False
+
+        logger.exception(
+            "Unexpected offset recommendation integration "
+            "error for user_id=%s.",
+            user.id,
+        )
+
+    return success
