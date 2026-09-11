@@ -40,11 +40,20 @@ class AnalyticsAggregationServiceTests(TestCase):
         total_emission,
         status=CarbonActivity.Status.COMPLETED,
         calculated_at=None,
+        activity_created_at=None,
     ):
         activity = CarbonActivity.objects.create(
             user=user,
             status=status,
         )
+
+        if activity_created_at is not None:
+            CarbonActivity.objects.filter(
+                pk=activity.pk
+            ).update(
+                created_at=activity_created_at
+            )
+            activity.refresh_from_db()
 
         footprint = CarbonFootprint.objects.create(
             carbon_activity=activity,
@@ -127,16 +136,19 @@ class AnalyticsAggregationServiceTests(TestCase):
             self.user,
             "10.0000",
             calculated_at=january_1,
+            activity_created_at=january_1,
         )
         self.create_footprint(
             self.user,
             "5.0000",
             calculated_at=january_2,
+            activity_created_at=january_2,
         )
         self.create_footprint(
             self.user,
             "8.0000",
             calculated_at=february,
+            activity_created_at=february,
         )
 
         result = list(
@@ -172,16 +184,19 @@ class AnalyticsAggregationServiceTests(TestCase):
             self.user,
             "10.0000",
             calculated_at=monday,
+            activity_created_at=monday,
         )
         self.create_footprint(
             self.user,
             "5.0000",
             calculated_at=wednesday,
+            activity_created_at=wednesday,
         )
         self.create_footprint(
             self.user,
             "8.0000",
             calculated_at=next_week,
+            activity_created_at=next_week,
         )
 
         result = list(

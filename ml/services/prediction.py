@@ -6,6 +6,8 @@ from typing import Any
 
 import pandas as pd
 
+from carbon.models import ActivityCategory
+
 from ml.services.feature_engineering import (
     MLDataError,
     get_completed_activities,
@@ -66,12 +68,9 @@ def _build_latest_month_features(user_id: int) -> tuple[pd.DataFrame, date]:
         )
 
     active_categories = list(
-        {
-            activity_entry.category
-            for activity in activities
-            for activity_entry in activity.entries.all()
-            if activity_entry.category.is_active
-        }
+        ActivityCategory.objects
+        .filter(is_active=True)
+        .order_by("display_order", "name")
     )
 
     if not active_categories:

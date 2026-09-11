@@ -46,7 +46,7 @@ class Command(BaseCommand):
                 "model_version": MODEL_VERSION,
                 "prediction_type": "next_month_carbon_footprint",
                 "target": TARGET_NAME,
-                "features": list(result.feature_names),
+                "feature_names": list(result.feature_names),
                 "sample_count": result.sample_count,
                 "training_samples": result.training_samples,
                 "test_samples": result.test_samples,

@@ -58,7 +58,11 @@ class AnalyticsAggregationService:
                 carbon_activity__user=user,
                 carbon_activity__status=CarbonActivity.Status.COMPLETED,
             )
-            .annotate(month=TruncMonth("calculated_at"))
+            .annotate(
+                month=TruncMonth(
+                    "carbon_activity__created_at"
+                )
+            )
             .values("month")
             .annotate(total_emission=Sum("total_emission"))
             .order_by("month")
@@ -76,7 +80,11 @@ class AnalyticsAggregationService:
                 carbon_activity__user=user,
                 carbon_activity__status=CarbonActivity.Status.COMPLETED,
             )
-            .annotate(week=TruncWeek("calculated_at"))
+            .annotate(
+                week=TruncWeek(
+                    "carbon_activity__created_at"
+                )
+            )
             .values("week")
             .annotate(total_emission=Sum("total_emission"))
             .order_by("week")

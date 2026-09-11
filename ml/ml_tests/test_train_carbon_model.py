@@ -80,7 +80,7 @@ class TrainCarbonModelCommandTests(TestCase):
         )
 
         self.assertEqual(
-            metadata["features"],
+            metadata["feature_names"],
             [
                 "previous_electricity",
                 "previous_transportation",
