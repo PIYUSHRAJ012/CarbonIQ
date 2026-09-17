@@ -136,15 +136,49 @@
                                 <span class="fs-6 text-muted">kg CO₂e</span>
                             </h2>
 
-                            <p class="text-muted mb-1">
+                            <p class="text-muted mb-3">
                                 Predicted emission for
                                 {{ carbon_prediction.target_period|date:"F Y" }}
                             </p>
 
+                            <div style="height: 220px;">
+                                <canvas id="prediction-chart"></canvas>
+                            </div>
+
+                            <div class="d-flex justify-content-center gap-4 mt-3 small text-muted">
+                                <span>
+                                    <span
+                                        class="d-inline-block me-1"
+                                        style="
+                                            width: 10px;
+                                            height: 10px;
+                                            background-color: #0d6efd;
+                                            border-radius: 50%;
+                                        "
+                                    ></span>
+                                    Actual
+                                </span>
+
+                                <span>
+                                    <span
+                                        class="d-inline-block me-1"
+                                        style="
+                                            width: 22px;
+                                            height: 3px;
+                                            background-color: #dc3545;
+                                            vertical-align: middle;
+                                        "
+                                    ></span>
+                                    Predicted
+                                </span>
+                            </div>
+
                             {% if carbon_prediction.model_version %}
-                                <small class="text-muted">
-                                    Model: {{ carbon_prediction.model_version }}
-                                </small>
+                                <div class="mt-2">
+                                    <small class="text-muted">
+                                        Model: {{ carbon_prediction.model_version }}
+                                    </small>
+                                </div>
                             {% endif %}
                         </div>
                     {% else %}
@@ -179,7 +213,7 @@
                     </div>
 
                     {% if user_segment %}
-                        <div class="text-center py-3">
+                        <div class="text-center mb-3">
 
                             <h3 class="fw-bold mb-2">
                                 {{ user_segment.profile_name }}
@@ -192,14 +226,20 @@
                                 </p>
                             {% endif %}
 
-                            {% if user_segment.selected_k %}
-                                <small class="text-muted">
-                                    Segment {{ user_segment.cluster_id }}
-                                    · K={{ user_segment.selected_k }}
-                                </small>
-                            {% endif %}
-
                         </div>
+
+                        <div style="height: 230px;">
+                            <canvas id="segment-chart"></canvas>
+                        </div>
+
+                        {% if user_segment.selected_k %}
+                            <div class="text-center mt-2">
+                                <small class="text-muted">
+                                    K-Means segmentation
+                                    · {{ user_segment.selected_k }} behavioral groups
+                                </small>
+                            </div>
+                        {% endif %}
                     {% else %}
                         <div class="text-center py-4">
                             <i class="bi bi-info-circle fs-2 text-muted"></i>
@@ -217,7 +257,7 @@
             </div>
         </div>
 
-        </div>
+    </div>
 
     <!-- E7 Advanced Sustainability Insights -->
     <div class="card shadow-sm border-0 mb-4">
@@ -1163,6 +1203,8 @@
 {{ monthly_chart_data|json_script:"monthly-chart-data" }}
 {{ weekly_chart_data|json_script:"weekly-chart-data" }}
 {{ category_chart_data|json_script:"category-chart-data" }}
+{{ prediction_chart_data|json_script:"prediction-chart-data" }}
+{{ segment_chart_data|json_script:"segment-chart-data" }}
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -1179,143 +1221,326 @@
             document.getElementById("weekly-chart-data").textContent
         );
 
-        // Monthly chart
-    if (monthlyData.length > 0) {
-        const monthlyLabels = monthlyData.map(item => item.label);
-        const monthlyValues = monthlyData.map(item => item.value);
-
-        Plotly.newPlot(
-            "monthly-emissions-chart",
-            [
-                {
-                    x: monthlyLabels,
-                    y: monthlyValues,
-                    type: "scatter",
-                    mode: "lines+markers",
-                    hovertemplate:
-                        "<b>%{x}</b><br>" +
-                        "Emission: %{y:.2f} kg CO₂e" +
-                        "<extra></extra>"
-                }
-            ],
-            {
-                title: "Monthly Carbon Trend",
-                xaxis: {
-                    title: "Month"
-                },
-                yaxis: {
-                    title: "kg CO₂e"
-                },
-                margin: {
-                    t: 50,
-                    r: 20,
-                    b: 60,
-                    l: 70
-                },
-                responsive: true
-            },
-            {
-                responsive: true
-            }
+        const predictionDataElement = document.getElementById(
+            "prediction-chart-data"
         );
-    }
+
+        const segmentDataElement = document.getElementById(
+            "segment-chart-data"
+        );
+
+        const predictionData = predictionDataElement
+            ? JSON.parse(predictionDataElement.textContent)
+            : null;
+
+        const segmentData = segmentDataElement
+            ? JSON.parse(segmentDataElement.textContent)
+            : null;
+        // ML prediction chart
+        if (
+            predictionData &&
+            document.getElementById("prediction-chart")
+        ) {
+            const predictionChart = document.getElementById(
+                "prediction-chart"
+            );
+
+            new Chart(predictionChart, {
+                type: "line",
+
+                data: {
+                    labels: predictionData.labels,
+
+                    datasets: [
+                        {
+                            label: "Actual",
+                            data: predictionData.actual,
+                            borderColor: "#0d6efd",
+                            backgroundColor: "#0d6efd",
+                            pointBackgroundColor: "#0d6efd",
+                            pointBorderColor: "#0d6efd",
+                            tension: 0.35,
+                            borderWidth: 3,
+                            pointRadius: 3,
+                            pointHoverRadius: 5,
+                            fill: false,
+                        },
+                        {
+                            label: "Predicted",
+                            data: predictionData.predicted,
+                            borderColor: "#dc3545",
+                            backgroundColor: "#dc3545",
+                            pointBackgroundColor: "#dc3545",
+                            pointBorderColor: "#dc3545",
+                            tension: 0.35,
+                            borderDash: [6, 5],
+                            borderWidth: 3,
+                            pointRadius: 5,
+                            pointHoverRadius: 7,
+                            fill: false,
+                        },
+                    ],
+                },
+
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+
+                    plugins: {
+                        legend: {
+                            display: false,
+                        },
+
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    return (
+                                        context.dataset.label +
+                                        ": " +
+                                        context.parsed.y.toFixed(2) +
+                                        " kg CO₂e"
+                                    );
+                                },
+                            },
+                        },
+                    },
+
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: "kg CO₂e",
+                            },
+                        },
+
+                        x: {
+                            grid: {
+                                display: false,
+                            },
+                        },
+                    },
+                },
+            });
+        }
+        // ML user segment chart
+        if (
+            segmentData &&
+            segmentData.length > 0 &&
+            document.getElementById("segment-chart")
+        ) {
+            const segmentChart = document.getElementById(
+                "segment-chart"
+            );
+
+            new Chart(segmentChart, {
+                type: "bar",
+
+                data: {
+                    labels: segmentData.map(
+                        item => item.label
+                    ),
+
+                    datasets: [
+                        {
+                            label: "Relative strength",
+
+                            data: segmentData.map(
+                                item => item.value
+                            ),
+
+                            backgroundColor: segmentData.map(
+                                item =>
+                                    item.is_dominant
+                                        ? "#198754"
+                                        : "#ced4da"
+                            ),
+
+                            borderRadius: 6,
+                            borderSkipped: false,
+                        },
+                    ],
+                },
+
+                options: {
+                    indexAxis: "y",
+
+                    responsive: true,
+                    maintainAspectRatio: false,
+
+                    plugins: {
+                        legend: {
+                            display: false,
+                        },
+
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    return (
+                                        "Relative strength: " +
+                                        context.parsed.x.toFixed(2)
+                                    );
+                                },
+                            },
+                        },
+                    },
+
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+
+                            title: {
+                                display: true,
+                                text: "Relative strength",
+                            },
+                        },
+
+                        y: {
+                            grid: {
+                                display: false,
+                            },
+                        },
+                    },
+                },
+            });
+        }
+        // Monthly chart
+        if (monthlyData.length > 0) {
+            const monthlyLabels = monthlyData.map(item => item.label);
+            const monthlyValues = monthlyData.map(item => item.value);
+
+            Plotly.newPlot(
+                "monthly-emissions-chart",
+                [
+                    {
+                        x: monthlyLabels,
+                        y: monthlyValues,
+                        type: "scatter",
+                        mode: "lines+markers",
+                        hovertemplate:
+                            "<b>%{x}</b><br>" +
+                            "Emission: %{y:.2f} kg CO₂e" +
+                            "<extra></extra>"
+                    }
+                ],
+                {
+                    title: "Monthly Carbon Trend",
+                    xaxis: {
+                        title: "Month"
+                    },
+                    yaxis: {
+                        title: "kg CO₂e"
+                    },
+                    margin: {
+                        t: 50,
+                        r: 20,
+                        b: 60,
+                        l: 70
+                    },
+                    responsive: true
+                },
+                {
+                    responsive: true
+                }
+            );
+        }
 
         // Weekly chart
-    if (weeklyData.length > 0) {
-        const weeklyLabels = weeklyData.map(item => item.label);
-        const weeklyValues = weeklyData.map(item => item.value);
+        if (weeklyData.length > 0) {
+            const weeklyLabels = weeklyData.map(item => item.label);
+            const weeklyValues = weeklyData.map(item => item.value);
 
-        Plotly.newPlot(
-            "weekly-emissions-chart",
-            [
+            Plotly.newPlot(
+                "weekly-emissions-chart",
+                [
+                    {
+                        x: weeklyLabels,
+                        y: weeklyValues,
+                        type: "scatter",
+                        mode: "lines+markers",
+                        hovertemplate:
+                            "<b>%{x}</b><br>" +
+                            "Emission: %{y:.2f} kg CO₂e" +
+                            "<extra></extra>"
+                    }
+                ],
                 {
-                    x: weeklyLabels,
-                    y: weeklyValues,
-                    type: "scatter",
-                    mode: "lines+markers",
-                    hovertemplate:
-                        "<b>%{x}</b><br>" +
-                        "Emission: %{y:.2f} kg CO₂e" +
-                        "<extra></extra>"
-                }
-            ],
-            {
-                title: "Weekly Carbon Trend",
-                xaxis: {
-                    title: "Week"
+                    title: "Weekly Carbon Trend",
+                    xaxis: {
+                        title: "Week"
+                    },
+                    yaxis: {
+                        title: "kg CO₂e"
+                    },
+                    margin: {
+                        t: 50,
+                        r: 20,
+                        b: 60,
+                        l: 70
+                    },
+                    responsive: true
                 },
-                yaxis: {
-                    title: "kg CO₂e"
-                },
-                margin: {
-                    t: 50,
-                    r: 20,
-                    b: 60,
-                    l: 70
-                },
-                responsive: true
-            },
-            {
-                responsive: true
-            }
-        );
-    }
-
-    // Category-wise doughnut chart
-if (categoryData.length > 0) {
-
-    const categoryLabels = categoryData.map(
-        item => item.label
-    );
-
-    const categoryValues = categoryData.map(
-        item => item.value
-    );
-
-    const categoryChart = document.getElementById(
-        "category-emissions-chart"
-    );
-
-    new Chart(categoryChart, {
-        type: "doughnut",
-
-        data: {
-            labels: categoryLabels,
-
-            datasets: [
                 {
-                    data: categoryValues
+                    responsive: true
                 }
-            ]
-        },
+            );
+        }
 
-        options: {
-            responsive: true,
+        // Category-wise doughnut chart
+        if (categoryData.length > 0) {
 
-            maintainAspectRatio: false,
+            const categoryLabels = categoryData.map(
+                item => item.label
+            );
 
-            plugins: {
-                legend: {
-                    position: "bottom"
+            const categoryValues = categoryData.map(
+                item => item.value
+            );
+
+            const categoryChart = document.getElementById(
+                "category-emissions-chart"
+            );
+
+            new Chart(categoryChart, {
+                type: "doughnut",
+
+                data: {
+                    labels: categoryLabels,
+
+                    datasets: [
+                        {
+                            data: categoryValues
+                        }
+                    ]
                 },
 
-                tooltip: {
-                    callbacks: {
-                        label: function (context) {
-                            return (
-                                context.label +
-                                ": " +
-                                context.parsed.toFixed(2) +
-                                " kg CO₂e"
-                            );
+                options: {
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    plugins: {
+                        legend: {
+                            position: "bottom"
+                        },
+
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    return (
+                                        context.label +
+                                        ": " +
+                                        context.parsed.toFixed(2) +
+                                        " kg CO₂e"
+                                    );
+                                }
+                            }
                         }
                     }
                 }
-            }
+            });
         }
     });
-}
-});
 </script>
 
 {% endblock %}

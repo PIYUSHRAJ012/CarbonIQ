@@ -50,22 +50,17 @@ def recommendations(request):
     # These are UserRecommendation records and are intentionally
     # separate from the E5 OffsetRecommendation model.
     offset_recommendations = (
-        UserRecommendation.objects
+        OffsetRecommendation.objects
         .filter(
             user=request.user,
-            status=UserRecommendation.Status.ACTIVE,
-            recommendation__action_type=(
-                Recommendation.ActionType.OFFSET
-            ),
+            status=OffsetRecommendation.Status.ACTIVE,
         )
         .select_related(
-            "recommendation",
-            "recommendation__category",
+            "offset_project",
         )
         .order_by(
             "-score",
             "-generated_at",
-            "recommendation__title",
         )
     )
 

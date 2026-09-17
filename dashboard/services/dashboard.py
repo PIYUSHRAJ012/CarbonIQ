@@ -13,6 +13,7 @@ from dashboard.services.insights.signals import InsightSignals
 from dashboard.services.insights.service import build_insights
 from gamification.services.engagement import build_engagement_snapshot
 
+
 class DashboardService:
     """
     Builds the data context required by the CarbonIQ dashboard.
@@ -38,7 +39,9 @@ class DashboardService:
         )
 
         try:
-            benchmark_comparison = get_user_monthly_benchmark_comparison(user)
+            benchmark_comparison = (
+                get_user_monthly_benchmark_comparison(user)
+            )
         except ValueError:
             benchmark_comparison = None
 
@@ -50,11 +53,16 @@ class DashboardService:
 
         try:
             user_segment = get_user_segment_profile(user.id)
-        except (UserSegmentProfileError, SegmentationPredictionError):
+        except (
+            UserSegmentProfileError,
+            SegmentationPredictionError,
+        ):
             user_segment = None
 
         insight_signals = InsightSignals(
-            current_total_emission=AnalyticsAggregationService.get_total_emission(user),
+            current_total_emission=(
+                AnalyticsAggregationService.get_total_emission(user)
+            ),
             monthly_emissions=tuple(monthly_emissions),
             weekly_emissions=tuple(weekly_emissions),
             category_emissions=tuple(category_emissions),
@@ -78,6 +86,104 @@ class DashboardService:
         # E8 Gamification & Engagement
         gamification = build_engagement_snapshot(user)
 
+        # ------------------------------------------------------------------
+        # E2 ML visualization data
+        # ------------------------------------------------------------------
+
+        # Existing monthly chart data.
+        monthly_chart_data = [
+            {
+                "label": item["month"].strftime("%B %Y"),
+                "value": float(item["total_emission"]),
+            }
+            for item in monthly_emissions
+        ]
+
+        # Random Forest prediction chart.
+        #
+        # The actual series contains the user's historical monthly
+        # emissions. The predicted series contains the last actual point
+        # and then the next-month prediction so Chart.js can draw a
+        # continuous transition into the prediction.
+        prediction_chart_data = None
+
+        if carbon_prediction:
+            actual_labels = [
+                item["label"]
+                for item in monthly_chart_data
+            ]
+
+            actual_values = [
+                item["value"]
+                for item in monthly_chart_data
+            ]
+
+            prediction_label = (
+                carbon_prediction.target_period.strftime(
+                    "%B %Y"
+                )
+            )
+
+            chart_labels = [
+                *actual_labels,
+                prediction_label,
+            ]
+
+            chart_actual_values = [
+                *actual_values,
+                None,
+            ]
+
+            if actual_values:
+                chart_predicted_values = (
+                    [None] * (len(actual_values) - 1)
+                    + [
+                        actual_values[-1],
+                        float(
+                            carbon_prediction.predicted_emission
+                        ),
+                    ]
+                )
+            else:
+                chart_predicted_values = [
+                    float(
+                        carbon_prediction.predicted_emission
+                    )
+                ]
+
+            prediction_chart_data = {
+                "labels": chart_labels,
+                "actual": chart_actual_values,
+                "predicted": chart_predicted_values,
+            }
+
+        # K-Means / behavioural-profile chart.
+        #
+        # domain_scores already come from the existing segmentation
+        # interpretation layer. We only convert them into JSON-safe,
+        # chart-ready values and mark the user's dominant domain.
+        segment_chart_data = None
+
+        if user_segment:
+            segment_chart_data = [
+                {
+                    "label": domain.replace(
+                        "_",
+                        " ",
+                    ).title(),
+                    "value": float(score),
+                    "is_dominant": (
+                        domain
+                        == user_segment.dominant_domain
+                    ),
+                }
+                for domain, score in sorted(
+                    user_segment.domain_scores.items(),
+                    key=lambda item: item[1],
+                    reverse=True,
+                )
+            ]
+
         return {
             "total_emission": (
                 AnalyticsAggregationService.get_total_emission(user)
@@ -89,13 +195,7 @@ class DashboardService:
             "category_emissions": category_emissions,
 
             # Chart-ready data
-            "monthly_chart_data": [
-                {
-                    "label": item["month"].strftime("%B %Y"),
-                    "value": float(item["total_emission"]),
-                }
-                for item in monthly_emissions
-            ],
+            "monthly_chart_data": monthly_chart_data,
 
             "weekly_chart_data": [
                 {
@@ -112,6 +212,10 @@ class DashboardService:
                 }
                 for item in category_emissions
             ],
+
+            # E2 ML chart data
+            "prediction_chart_data": prediction_chart_data,
+            "segment_chart_data": segment_chart_data,
 
             # E4 Benchmark comparison
             "benchmark_comparison": benchmark_comparison,
@@ -130,6 +234,7 @@ class DashboardService:
                 if benchmark_comparison
                 else ()
             ),
+
             # E2 Machine Learning
             "carbon_prediction": carbon_prediction,
             "user_segment": user_segment,

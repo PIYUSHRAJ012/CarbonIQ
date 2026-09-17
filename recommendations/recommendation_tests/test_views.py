@@ -193,21 +193,18 @@ class RecommendationsViewE9Tests(TestCase):
             status=UserRecommendation.Status.ACTIVE,
         )
 
-        offset = Recommendation.objects.create(
-            title="Consider residual emission offsets",
-            description="Test offset action.",
-            category=category,
-            action_type=Recommendation.ActionType.OFFSET,
-            priority=50,
-            is_active=True,
+        offset_project = self.make_offset_project(
+            name="Test Offset Project",
+            project_id="E9-VIEW-004",
         )
 
-        UserRecommendation.objects.create(
+        OffsetRecommendation.objects.create(
             user=self.user,
-            recommendation=offset,
+            offset_project=offset_project,
             score=Decimal("70.0000"),
-            reason="Test offset action.",
-            status=UserRecommendation.Status.ACTIVE,
+            reason="Test offset recommendation.",
+            indicative_tonnes=Decimal("1.2500"),
+            status=OffsetRecommendation.Status.ACTIVE,
         )
 
         response = self.client.get(
