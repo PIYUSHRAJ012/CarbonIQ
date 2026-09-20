@@ -10,24 +10,111 @@ Profile
 
     <div class="col-md-8">
 
-        <!-- Profile Information -->
+        <!-- Personal Information -->
         <div class="card shadow-sm mb-4">
 
-            <div class="card-body">
+            <div class="card-body p-4">
 
-                <h2 class="fw-bold mb-3">
-                    {{ request.user.full_name }}
-                </h2>
+                <div class="d-flex align-items-center mb-4">
 
-                <p class="text-muted mb-3">
-                    {{ request.user.email }}
-                </p>
+                    <div class="me-3 fs-3 carbon-accent-purple">
+                        <i class="bi bi-person-circle"></i>
+                    </div>
 
-                <hr>
+                    <div>
+                        <h4 class="fw-bold mb-1">
+                            Personal Information
+                        </h4>
 
-                <p class="mb-0">
-                    Welcome to CarbonIQ.
-                </p>
+                        <p class="text-muted mb-0">
+                            Your CarbonIQ account information
+                        </p>
+                    </div>
+
+                </div>
+
+                <div class="row g-4">
+
+                    <!-- Name -->
+                    <div class="col-md-6">
+
+                        <div class="profile-info-item">
+
+                            <div class="text-muted small mb-1">
+                                <i class="bi bi-person me-1"></i>
+                                Name
+                            </div>
+
+                            <div class="fw-semibold">
+                                {{ request.user.full_name }}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Email -->
+                    <div class="col-md-6">
+
+                        <div class="profile-info-item">
+
+                            <div class="text-muted small mb-1">
+                                <i class="bi bi-envelope me-1"></i>
+                                Email
+                            </div>
+
+                            <div class="fw-semibold">
+                                {{ request.user.email }}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Location -->
+                    <div class="col-md-6">
+
+                        <div class="profile-info-item">
+
+                            <div class="text-muted small mb-1">
+                                <i class="bi bi-geo-alt me-1"></i>
+                                Location
+                            </div>
+
+                            <div class="fw-semibold">
+                                {% if location %}
+                                    {{ location.district }},
+                                    {{ location.state }}
+                                {% else %}
+                                    <span class="text-muted">
+                                        Not set
+                                    </span>
+                                {% endif %}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Member Since -->
+                    <div class="col-md-6">
+
+                        <div class="profile-info-item">
+
+                            <div class="text-muted small mb-1">
+                                <i class="bi bi-calendar3 me-1"></i>
+                                Member since
+                            </div>
+
+                            <div class="fw-semibold">
+                                {{ request.user.date_joined|date:"F Y" }}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
 
             </div>
 
@@ -37,10 +124,10 @@ Profile
         <!-- Benchmarking Location -->
         <div class="card shadow-sm">
 
-            <div class="card-header bg-white border-0 pt-4 px-4">
+            <div class="card-header border-0 pt-4 px-4">
 
                 <h4 class="fw-bold mb-1">
-                    <i class="bi bi-geo-alt me-1"></i>
+                    <i class="bi bi-geo-alt me-1 carbon-accent-teal"></i>
                     Benchmarking Location
                 </h4>
 
@@ -50,7 +137,6 @@ Profile
                 </p>
 
             </div>
-
 
             <div class="card-body px-4 pb-4">
 
@@ -99,9 +185,11 @@ Profile
 
 
                     {% if form.non_field_errors %}
+
                         <div class="alert alert-danger">
                             {{ form.non_field_errors }}
                         </div>
+
                     {% endif %}
 
 
@@ -161,7 +249,10 @@ Profile
                 option.value = district.value;
                 option.textContent = district.label;
 
-                if (normalize(district.value) === normalize(initialDistrict)) {
+                if (
+                    normalize(district.value) ===
+                    normalize(initialDistrict)
+                ) {
                     option.selected = true;
                 }
 

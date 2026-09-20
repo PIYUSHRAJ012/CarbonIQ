@@ -6,44 +6,6 @@
 
 {% block content %}
 
-<style>
-    .offset-guidance-card {
-        border-radius: 0.75rem;
-        transition: transform 0.15s ease, box-shadow 0.15s ease;
-    }
-
-    .offset-guidance-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08) !important;
-    }
-
-    .offset-guidance-score {
-        min-width: 64px;
-    }
-
-    .offset-guidance-meta {
-        font-size: 0.875rem;
-    }
-
-    .offset-guidance-label {
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-    }
-
-    .offset-guidance-link {
-        text-decoration: none;
-    }
-
-    .offset-guidance-link:hover {
-        text-decoration: underline;
-    }
-
-    .offset-guidance-factor {
-        font-size: 0.875rem;
-    }
-</style>
-
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h1 class="fw-bold mb-1">Your Recommendations</h1>
@@ -56,9 +18,9 @@
 
 <!-- Sustainability Recommendations -->
 
-<div class="card border-0 shadow-sm mb-4">
+<div class="card border-0 shadow-sm mb-4 carbon-section-green">
 
-    <div class="card-header bg-white border-0 pt-4 px-4">
+    <div class="card-header border-0 pt-4 px-4">
 
         <h4 class="fw-bold mb-1">
             Sustainability Actions
@@ -81,39 +43,43 @@
 
                     <div class="col-md-6 col-xl-4">
 
-                        <div class="card h-100 border shadow-sm">
+                        <div class="card recommendation-action-card h-100">
 
                             <div class="card-body d-flex flex-column">
 
-                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                                    <div class="d-flex align-items-start gap-2">
+                                        <div class="recommendation-action-icon">
+                                            <i class="bi bi-leaf"></i>
+                                        </div>
 
-                                    <h5 class="fw-bold mb-0">
-                                        {{ item.recommendation.title }}
-                                    </h5>
+                                        <h5 class="fw-bold mb-0">
+                                            {{ item.recommendation.title }}
+                                        </h5>
+                                    </div>
 
-                                    <span class="badge bg-success">
+                                    <span class="badge recommendation-score-badge">
                                         {{ item.score|floatformat:1 }}/100
                                     </span>
-
                                 </div>
 
 
                                 {% if item.recommendation.category %}
-
-                                    <p class="small text-muted mb-2">
-                                        <strong>Category:</strong>
-                                        {{ item.recommendation.category.name }}
-                                    </p>
-
+                                    <div class="mb-3">
+                                        <span class="recommendation-category-label">
+                                            <i class="bi bi-tag me-1"></i>
+                                            {{ item.recommendation.category.name }}
+                                        </span>
+                                    </div>
                                 {% endif %}
 
 
-                                <p class="text-muted">
+                                <p class="text-muted mb-0 recommendation-description">
                                     {{ item.recommendation.description }}
                                 </p>
 
 
-                                <div class="mt-auto pt-3 border-top">
+                                <div class="mt-auto pt-3 mt-3 border-top recommendation-reason">
 
                                     <p class="small mb-2">
                                         <strong>Why this is recommended:</strong>
@@ -205,9 +171,9 @@
 
 <!-- E9: Expanded Carbon Offset Guidance -->
 
-<div class="card border-0 shadow-sm">
+<div class="card border-0 shadow-sm carbon-section-teal">
 
-    <div class="card-header bg-white border-0 pt-4 px-4">
+    <div class="card-header border-0 pt-4 px-4">
 
         <div class="d-flex justify-content-between align-items-start gap-3">
 
@@ -223,7 +189,7 @@
             </div>
 
             {% if offset_guidance %}
-                <span class="badge bg-light text-dark border">
+                <span class="badge text-bg-light border">
                     {{ offset_guidance|length }} project{{ offset_guidance|length|pluralize }}
                 </span>
             {% endif %}
@@ -237,7 +203,7 @@
 
         {% if offset_guidance %}
 
-            <div class="alert alert-light border mb-4">
+            <div class="border rounded p-3 mb-4 offset-equivalent-card">
 
                 <div class="d-flex align-items-start gap-3">
 
@@ -272,40 +238,42 @@
 
                                 <!-- Header -->
 
-                                <div class="d-flex justify-content-between
-                                            align-items-start gap-3 mb-3">
+                                <div class="offset-guidance-header d-flex justify-content-between align-items-start gap-3 mb-4">
 
-                                    <div>
+                                    <div class="d-flex align-items-start gap-3">
 
-                                        <div class="d-flex align-items-center
-                                                    gap-2 flex-wrap mb-1">
-
-                                            <span class="badge bg-primary">
-                                                #{{ item.project.rank }}
-                                            </span>
-
-                                            <h5 class="fw-bold mb-0">
-                                                {{ item.project.project_name }}
-                                            </h5>
-
+                                        <div class="offset-project-icon">
+                                            <i class="bi bi-globe2"></i>
                                         </div>
 
-                                        <p class="text-muted small mb-0">
-                                            {{ item.project.project_type }}
-                                            ·
-                                            {{ item.project.country }}
-                                            {% if item.project.region %}
-                                                · {{ item.project.region }}
-                                            {% endif %}
-                                        </p>
+                                        <div>
+                                            <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+
+                                                <span class="badge offset-guidance-rank">
+                                                    #{{ item.project.rank }}
+                                                </span>
+
+                                                <h5 class="fw-bold mb-0">
+                                                    {{ item.project.project_name }}
+                                                </h5>
+
+                                            </div>
+
+                                            <p class="text-muted small mb-0">
+                                                {{ item.project.project_type }}
+                                                ·
+                                                {{ item.project.country }}
+                                                {% if item.project.region %}
+                                                    · {{ item.project.region }}
+                                                {% endif %}
+                                            </p>
+                                        </div>
 
                                     </div>
 
-
                                     <div class="text-end">
 
-                                        <div class="badge bg-secondary
-                                                    offset-guidance-score">
+                                        <div class="badge offset-guidance-score">
 
                                             {{ item.project.score|floatformat:1 }}/100
 
@@ -326,10 +294,13 @@
 
                                     <div class="col-md-4">
 
-                                        <div class="border rounded p-3 h-100">
+                                        <div class="border rounded p-3 h-100 offset-meta-card">
 
-                                            <div class="offset-guidance-label
-                                                        text-muted mb-1">
+                                            <div class="offset-meta-icon carbon-accent-blue">
+                                                <i class="bi bi-journal-check"></i>
+                                            </div>
+
+                                            <div class="offset-guidance-label text-muted mb-1">
                                                 Registry
                                             </div>
 
@@ -338,8 +309,7 @@
                                             </div>
 
                                             <div class="small text-muted">
-                                                ID:
-                                                {{ item.project.registry_project_id }}
+                                                ID: {{ item.project.registry_project_id }}
                                             </div>
 
                                         </div>
@@ -349,75 +319,66 @@
 
                                     <div class="col-md-4">
 
-                                        <div class="border rounded p-3 h-100">
+                                        <div class="border rounded p-3 h-100 offset-meta-card">
 
-                                            <div class="offset-guidance-label
-                                                        text-muted mb-1">
+                                            <div class="offset-meta-icon carbon-accent-green">
+                                                <i class="bi bi-activity"></i>
+                                            </div>
+
+                                            <div class="offset-guidance-label text-muted mb-1">
                                                 Project Status
                                             </div>
 
                                             <div>
                                                 {% if item.project.project_status == "ACTIVE" %}
-
                                                     <span class="badge bg-success">
                                                         {{ item.project.project_status_label }}
                                                     </span>
-
                                                 {% else %}
-
                                                     <span class="badge bg-secondary">
                                                         {{ item.project.project_status_label }}
                                                     </span>
-
                                                 {% endif %}
                                             </div>
 
                                         </div>
-
                                     </div>
 
 
                                     <div class="col-md-4">
 
-                                        <div class="border rounded p-3 h-100">
+                                        <div class="border rounded p-3 h-100 offset-meta-card">
 
-                                            <div class="offset-guidance-label
-                                                        text-muted mb-1">
+                                            <div class="offset-meta-icon carbon-accent-teal">
+                                                <i class="bi bi-shield-check"></i>
+                                            </div>
+
+                                            <div class="offset-guidance-label text-muted mb-1">
                                                 Source Verification
                                             </div>
 
                                             <div>
-
                                                 {% if item.verification.state == "FRESH" %}
-
                                                     <span class="badge bg-success">
                                                         <i class="bi bi-check-circle me-1"></i>
                                                         {{ item.verification.state_label }}
                                                     </span>
-
                                                 {% elif item.verification.state == "AGING" %}
-
                                                     <span class="badge bg-warning text-dark">
                                                         <i class="bi bi-clock me-1"></i>
                                                         {{ item.verification.state_label }}
                                                     </span>
-
                                                 {% elif item.verification.state == "STALE" %}
-
                                                     <span class="badge bg-danger">
                                                         <i class="bi bi-exclamation-circle me-1"></i>
                                                         {{ item.verification.state_label }}
                                                     </span>
-
                                                 {% else %}
-
                                                     <span class="badge bg-secondary">
                                                         <i class="bi bi-question-circle me-1"></i>
                                                         {{ item.verification.state_label }}
                                                     </span>
-
                                                 {% endif %}
-
                                             </div>
 
                                             <div class="small text-muted mt-1">
@@ -439,16 +400,22 @@
 
                                 <!-- Suitability -->
 
-                                <div class="border rounded p-3 mb-4">
+                                <div class="border rounded p-3 mb-4 offset-suitability-card">
 
                                     <div class="d-flex justify-content-between
                                                 align-items-center mb-3">
 
-                                        <h6 class="fw-bold mb-0">
-                                            Why this project may suit you
-                                        </h6>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="offset-suitability-icon">
+                                                <i class="bi bi-stars"></i>
+                                            </div>
 
-                                        <span class="badge bg-light text-dark border">
+                                            <h6 class="fw-bold mb-0">
+                                                Why this project may suit you
+                                            </h6>
+                                        </div>
+
+                                        <span class="badge text-bg-light border">
                                             {{ item.suitability.matched_factor_count }}
                                             match{{ item.suitability.matched_factor_count|pluralize }}
                                         </span>
@@ -462,8 +429,7 @@
 
                                             <div class="col-md-6">
 
-                                                <div class="d-flex align-items-start
-                                                            gap-2 offset-guidance-factor">
+                                                <div class="d-flex align-items-start gap-2 offset-suitability-factor">
 
                                                     {% if factor.matched %}
 
@@ -502,12 +468,14 @@
 
                                 <!-- Indicative offset requirement -->
 
-                                <div class="alert alert-light border mb-4">
+                                <div class="alert border mb-4 carbon-guidance-note">
 
                                     <div class="d-flex align-items-start
                                                 gap-3">
 
-                                        <i class="bi bi-speedometer2 fs-5"></i>
+                                        <div class="offset-equivalent-icon">
+                                            <i class="bi bi-speedometer2"></i>
+                                        </div>
 
                                         <div>
 
@@ -537,7 +505,7 @@
 
                                 <!-- Source links -->
 
-                                <div class="d-flex flex-wrap gap-2 mb-4">
+                                <div class="d-flex flex-wrap gap-2 mb-4 offset-source-actions">
 
                                     {% if item.project.registry_url %}
 
@@ -573,22 +541,20 @@
 
                                 <!-- Guidance -->
 
-                                <div class="border-top pt-3">
+                                <div class="border-top pt-3 offset-guidance-footer">
 
-                                    <div class="small text-muted mb-2">
-
-                                        <i class="bi bi-shield-check me-1"></i>
-
-                                        {{ item.reduction_first_message }}
-
+                                    <div class="small offset-guidance-message mb-2">
+                                        <i class="bi bi-shield-check me-2 carbon-accent-green"></i>
+                                        <span>
+                                            {{ item.reduction_first_message }}
+                                        </span>
                                     </div>
 
-                                    <div class="small text-muted">
-
-                                        <i class="bi bi-info-circle me-1"></i>
-
-                                        {{ item.informational_message }}
-
+                                    <div class="small offset-guidance-message">
+                                        <i class="bi bi-info-circle me-2 carbon-accent-teal"></i>
+                                        <span>
+                                            {{ item.informational_message }}
+                                        </span>
                                     </div>
 
                                 </div>

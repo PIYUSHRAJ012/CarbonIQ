@@ -258,7 +258,7 @@ class GoldStandardAdapter(OffsetSourceAdapter):
         if not registry_url:
             registry_url = (
                 "https://registry.goldstandard.org/"
-                f"projects/details/{gs_id}"
+                f"projects?q=GS{gs_id}"
             )
 
         return NormalizedOffsetProject(

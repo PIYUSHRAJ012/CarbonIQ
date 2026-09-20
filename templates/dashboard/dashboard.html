@@ -29,7 +29,7 @@
 
         <!-- Total Carbon -->
         <div class="col-md-6 col-xl-4">
-            <div class="card border-0 shadow-sm h-100">
+            <div class="card border-0 shadow-sm h-100 carbon-card-green">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
@@ -58,7 +58,7 @@
 
         <!-- Months Tracked -->
         <div class="col-md-6 col-xl-4">
-            <div class="card border-0 shadow-sm h-100">
+            <div class="card border-0 shadow-sm h-100 carbon-card-blue">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
@@ -86,7 +86,7 @@
 
         <!-- Categories -->
         <div class="col-md-6 col-xl-4">
-            <div class="card border-0 shadow-sm h-100">
+            <div class="card border-0 shadow-sm h-100 carbon-card-amber">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
@@ -118,7 +118,7 @@
 
         <!-- Next Month Carbon Prediction -->
         <div class="col-lg-6">
-            <div class="card shadow-sm h-100 border-0">
+            <div class="card shadow-sm h-100 border-0 carbon-section-purple">
                 <div class="card-body">
 
                     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -141,7 +141,7 @@
                                 {{ carbon_prediction.target_period|date:"F Y" }}
                             </p>
 
-                            <div style="height: 220px;">
+                            <div class="dashboard-chart dashboard-chart-prediction">
                                 <canvas id="prediction-chart"></canvas>
                             </div>
 
@@ -201,7 +201,7 @@
 
         <!-- User Segmentation -->
         <div class="col-lg-6">
-            <div class="card shadow-sm h-100 border-0">
+            <div class="card shadow-sm h-100 border-0 carbon-section-purple">
                 <div class="card-body">
 
                     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -228,7 +228,7 @@
 
                         </div>
 
-                        <div style="height: 230px;">
+                        <div class="dashboard-chart dashboard-chart-segment">
                             <canvas id="segment-chart"></canvas>
                         </div>
 
@@ -260,7 +260,7 @@
     </div>
 
     <!-- E7 Advanced Sustainability Insights -->
-    <div class="card shadow-sm border-0 mb-4">
+    <div class="card shadow-sm border-0 mb-4 carbon-section-green">
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <div>
@@ -330,7 +330,7 @@
         </div>
     </div>
     <!-- E8 Gamification & Engagement -->
-    <section class="mt-5" id="gamification-section">
+    <section class="mt-4" id="gamification-section">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <div>
                 <h2 class="h4 mb-1">
@@ -344,7 +344,7 @@
         </div>
 
         <!-- Eco Score -->
-        <div class="card shadow-sm border-0 mb-4">
+        <div class="card shadow-sm border-0 mb-4 carbon-section-green">
             <div class="card-body">
                 <div class="row align-items-center">
                     <div class="col-lg-4 text-center">
@@ -447,7 +447,7 @@
         <!-- Achievements -->
         <div class="row g-4 mb-4">
             <div class="col-lg-6">
-                <div class="card shadow-sm border-0 h-100">
+                <div class="card shadow-sm border-0 h-100 carbon-section-green">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <h3 class="h5 mb-0">
@@ -508,7 +508,7 @@
 
             <!-- Active Challenges -->
             <div class="col-lg-6">
-                <div class="card shadow-sm border-0 h-100">
+                <div class="card shadow-sm border-0 h-100 carbon-section-amber">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <h3 class="h5 mb-0">
@@ -535,7 +535,7 @@
                                             </div>
                                         </div>
 
-                                        <span class="badge bg-light text-dark">
+                                        <span class="badge challenge-progress-badge">
                                             {{ user_challenge.progress }}
                                             /
                                             {{ user_challenge.challenge.target }}
@@ -635,7 +635,7 @@
         </div>
 
         <!-- Completed Challenges -->
-        <div class="card shadow-sm border-0">
+        <div class="card shadow-sm border-0 mb-4 carbon-section-green">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h3 class="h5 mb-0">
@@ -693,9 +693,9 @@
     <div class="row g-4 mb-4">
 
         <div class="col-12">
-            <div class="card border-0 shadow-sm">
+            <div class="card border-0 shadow-sm carbon-section-teal">
 
-                <div class="card-header bg-white border-0 pt-4 px-4">
+                <div class="card-header border-0 pt-4 px-4">
                     <h5 class="fw-bold mb-1">
                         <i class="bi bi-speedometer2 me-1"></i>
                         Carbon Benchmark
@@ -983,9 +983,9 @@
 
         <!-- Monthly -->
         <div class="col-lg-6">
-            <div class="card border-0 shadow-sm h-100">
+            <div class="card border-0 shadow-sm h-100 carbon-section-blue">
 
-                <div class="card-header bg-white border-0 pt-4 px-4">
+                <div class="card-header border-0 pt-4 px-4">
                     <h5 class="fw-bold mb-1">
                         Monthly Emissions
                     </h5>
@@ -997,7 +997,7 @@
 
                 <div class="card-body px-4">
 
-                    <div id="monthly-emissions-chart" class="w-100 mb-4" style="min-height: 350px;"></div>
+                    <div id="monthly-emissions-chart" class="dashboard-plotly-chart w-100 mb-4"></div>
 
                     {% if monthly_emissions %}
 
@@ -1049,9 +1049,9 @@
 
         <!-- Weekly -->
         <div class="col-lg-6">
-            <div class="card border-0 shadow-sm h-100">
+            <div class="card border-0 shadow-sm h-100 carbon-section-blue">
 
-                <div class="card-header bg-white border-0 pt-4 px-4">
+                <div class="card-header border-0 pt-4 px-4">
                     <h5 class="fw-bold mb-1">
                         Weekly Emissions
                     </h5>
@@ -1063,7 +1063,7 @@
 
                 <div class="card-body px-4">
 
-                    <div id="weekly-emissions-chart" class="w-100 mb-4" style="min-height: 350px;"></div>
+                    <div id="weekly-emissions-chart" class="dashboard-plotly-chart w-100 mb-4"></div>
 
                     {% if weekly_emissions %}
 
@@ -1118,9 +1118,9 @@
     <div class="row g-4">
 
         <div class="col-12">
-            <div class="card border-0 shadow-sm">
+            <div class="card border-0 shadow-sm carbon-section-blue">
 
-                <div class="card-header bg-white border-0 pt-4 px-4">
+                <div class="card-header border-0 pt-4 px-4">
                     <h5 class="fw-bold mb-1">
                         Category-wise Emissions
                     </h5>
@@ -1134,7 +1134,7 @@
 
                     <div class="row justify-content-center mb-4">
                         <div class="col-lg-7 col-xl-6">
-                            <div style="min-height: 350px;">
+                            <div class="dashboard-chart dashboard-chart-category">
                                 <canvas id="category-emissions-chart"></canvas>
                             </div>
                         </div>
@@ -1236,6 +1236,97 @@
         const segmentData = segmentDataElement
             ? JSON.parse(segmentDataElement.textContent)
             : null;
+
+        const chartInstances = [];
+
+        function getChartTheme() {
+            const styles = getComputedStyle(document.documentElement);
+            const isDark = document.documentElement.getAttribute("data-bs-theme") === "dark";
+
+            return {
+                text: styles.getPropertyValue("--bs-body-color").trim(),
+                mutedText: styles.getPropertyValue("--bs-secondary-color").trim(),
+                grid: isDark ? "rgba(255, 255, 255, 0.14)" : "rgba(33, 37, 41, 0.12)",
+                border: styles.getPropertyValue("--bs-border-color").trim(),
+                surface: styles.getPropertyValue("--carbon-card-bg").trim() || styles.getPropertyValue("--bs-body-bg").trim(),
+                tooltipBg: isDark ? "#2b3035" : "#ffffff",
+                tooltipText: styles.getPropertyValue("--bs-body-color").trim(),
+                neutral: isDark ? "#6c757d" : "#ced4da",
+            };
+        }
+
+        function chartTooltip(theme) {
+            return {
+                backgroundColor: theme.tooltipBg,
+                titleColor: theme.tooltipText,
+                bodyColor: theme.tooltipText,
+                borderColor: theme.border,
+                borderWidth: 1,
+            };
+        }
+
+        function applyChartTheme() {
+            const theme = getChartTheme();
+
+            chartInstances.forEach(chart => {
+                chart.options.plugins.tooltip = {
+                    ...chart.options.plugins.tooltip,
+                    ...chartTooltip(theme),
+                };
+
+                Object.values(chart.options.scales || {}).forEach(scale => {
+                    scale.ticks = { ...scale.ticks, color: theme.mutedText };
+                    scale.title = { ...scale.title, color: theme.text };
+                    scale.grid = { ...scale.grid, color: theme.grid };
+                });
+
+                if (chart.canvas.id === "segment-chart") {
+                    chart.data.datasets[0].backgroundColor = segmentData.map(item =>
+                        item.is_dominant ? "#198754" : theme.neutral
+                    );
+                }
+
+                if (chart.canvas.id === "category-emissions-chart") {
+                    chart.options.plugins.legend.labels.color = theme.text;
+                }
+
+                chart.update();
+            });
+
+            ["monthly-emissions-chart", "weekly-emissions-chart"].forEach(id => {
+                const element = document.getElementById(id);
+                if (!element || !element.data || element.data.length === 0) {
+                    return;
+                }
+
+                Plotly.relayout(element, getPlotlyLayout(theme));
+            });
+        }
+
+        function getPlotlyLayout(theme) {
+            return {
+                paper_bgcolor: "transparent",
+                plot_bgcolor: "transparent",
+                font: { color: theme.text },
+                hoverlabel: {
+                    bgcolor: theme.tooltipBg,
+                    bordercolor: theme.border,
+                    font: { color: theme.tooltipText },
+                },
+                xaxis: {
+                    color: theme.mutedText,
+                    gridcolor: theme.grid,
+                    zerolinecolor: theme.grid,
+                },
+                yaxis: {
+                    color: theme.mutedText,
+                    gridcolor: theme.grid,
+                    zerolinecolor: theme.grid,
+                },
+            };
+        }
+
+        const chartTheme = getChartTheme();
         // ML prediction chart
         if (
             predictionData &&
@@ -1245,7 +1336,7 @@
                 "prediction-chart"
             );
 
-            new Chart(predictionChart, {
+            chartInstances.push(new Chart(predictionChart, {
                 type: "line",
 
                 data: {
@@ -1292,6 +1383,7 @@
                         },
 
                         tooltip: {
+                            ...chartTooltip(chartTheme),
                             callbacks: {
                                 label: function (context) {
                                     return (
@@ -1311,17 +1403,27 @@
                             title: {
                                 display: true,
                                 text: "kg CO₂e",
+                                color: chartTheme.text,
+                            },
+                            ticks: {
+                                color: chartTheme.mutedText,
+                            },
+                            grid: {
+                                color: chartTheme.grid,
                             },
                         },
 
                         x: {
+                            ticks: {
+                                color: chartTheme.mutedText,
+                            },
                             grid: {
-                                display: false,
+                                color: chartTheme.grid,
                             },
                         },
                     },
                 },
-            });
+            }));
         }
         // ML user segment chart
         if (
@@ -1333,7 +1435,7 @@
                 "segment-chart"
             );
 
-            new Chart(segmentChart, {
+            chartInstances.push(new Chart(segmentChart, {
                 type: "bar",
 
                 data: {
@@ -1353,7 +1455,7 @@
                                 item =>
                                     item.is_dominant
                                         ? "#198754"
-                                        : "#ced4da"
+                                        : chartTheme.neutral
                             ),
 
                             borderRadius: 6,
@@ -1374,6 +1476,7 @@
                         },
 
                         tooltip: {
+                            ...chartTooltip(chartTheme),
                             callbacks: {
                                 label: function (context) {
                                     return (
@@ -1392,22 +1495,33 @@
                             title: {
                                 display: true,
                                 text: "Relative strength",
+                                color: chartTheme.text,
+                            },
+                            ticks: {
+                                color: chartTheme.mutedText,
+                            },
+                            grid: {
+                                color: chartTheme.grid,
                             },
                         },
 
                         y: {
+                            ticks: {
+                                color: chartTheme.mutedText,
+                            },
                             grid: {
-                                display: false,
+                                color: chartTheme.grid,
                             },
                         },
                     },
                 },
-            });
+            }));
         }
         // Monthly chart
         if (monthlyData.length > 0) {
             const monthlyLabels = monthlyData.map(item => item.label);
             const monthlyValues = monthlyData.map(item => item.value);
+            const monthlyLayout = getPlotlyLayout(chartTheme);
 
             Plotly.newPlot(
                 "monthly-emissions-chart",
@@ -1417,6 +1531,8 @@
                         y: monthlyValues,
                         type: "scatter",
                         mode: "lines+markers",
+                        line: { color: "#0d6efd" },
+                        marker: { color: "#0d6efd" },
                         hovertemplate:
                             "<b>%{x}</b><br>" +
                             "Emission: %{y:.2f} kg CO₂e" +
@@ -1425,10 +1541,13 @@
                 ],
                 {
                     title: "Monthly Carbon Trend",
+                    ...monthlyLayout,
                     xaxis: {
+                        ...monthlyLayout.xaxis,
                         title: "Month"
                     },
                     yaxis: {
+                        ...monthlyLayout.yaxis,
                         title: "kg CO₂e"
                     },
                     margin: {
@@ -1449,6 +1568,7 @@
         if (weeklyData.length > 0) {
             const weeklyLabels = weeklyData.map(item => item.label);
             const weeklyValues = weeklyData.map(item => item.value);
+            const weeklyLayout = getPlotlyLayout(chartTheme);
 
             Plotly.newPlot(
                 "weekly-emissions-chart",
@@ -1458,6 +1578,8 @@
                         y: weeklyValues,
                         type: "scatter",
                         mode: "lines+markers",
+                        line: { color: "#0d6efd" },
+                        marker: { color: "#0d6efd" },
                         hovertemplate:
                             "<b>%{x}</b><br>" +
                             "Emission: %{y:.2f} kg CO₂e" +
@@ -1466,10 +1588,13 @@
                 ],
                 {
                     title: "Weekly Carbon Trend",
+                    ...weeklyLayout,
                     xaxis: {
+                        ...weeklyLayout.xaxis,
                         title: "Week"
                     },
                     yaxis: {
+                        ...weeklyLayout.yaxis,
                         title: "kg CO₂e"
                     },
                     margin: {
@@ -1501,7 +1626,7 @@
                 "category-emissions-chart"
             );
 
-            new Chart(categoryChart, {
+            chartInstances.push(new Chart(categoryChart, {
                 type: "doughnut",
 
                 data: {
@@ -1509,7 +1634,19 @@
 
                     datasets: [
                         {
-                            data: categoryValues
+                            data: categoryValues,
+                            backgroundColor: [
+                                "#20c997",
+                                "#0d6efd",
+                                "#6f42c1",
+                                "#0dcaf0",
+                                "#fd7e14",
+                                "#ffc107",
+                                "#d63384",
+                                "#dc3545",
+                            ],
+                            borderColor: chartTheme.surface,
+                            borderWidth: 2,
                         }
                     ]
                 },
@@ -1521,10 +1658,14 @@
 
                     plugins: {
                         legend: {
-                            position: "bottom"
+                            position: "bottom",
+                            labels: {
+                                color: chartTheme.text,
+                            },
                         },
 
                         tooltip: {
+                            ...chartTooltip(chartTheme),
                             callbacks: {
                                 label: function (context) {
                                     return (
@@ -1538,8 +1679,13 @@
                         }
                     }
                 }
-            });
+            }));
         }
+
+        new MutationObserver(applyChartTheme).observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ["data-bs-theme"],
+        });
     });
 </script>
 

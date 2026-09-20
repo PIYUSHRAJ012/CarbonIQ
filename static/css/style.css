@@ -1,5 +1,10 @@
+html {
+    background-color: var(--bs-body-bg);
+}
+
 body {
-    background-color: #f8f9fa;
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
 }
 
 main {
@@ -18,4 +23,569 @@ main {
 
 #gamification-section .last-child-no-margin:last-child {
     margin-bottom: 0 !important;
+}
+
+.dashboard-chart-prediction {
+    height: 220px;
+}
+
+.dashboard-chart-segment {
+    height: 230px;
+}
+
+.dashboard-chart-category,
+.dashboard-plotly-chart {
+    min-height: 350px;
+}
+
+.challenge-progress-badge {
+    background-color: var(--bs-tertiary-bg);
+    color: var(--bs-body-color);
+    border: 1px solid var(--bs-border-color);
+}
+
+@media (max-width: 575.98px) {
+    .dashboard-chart-category,
+    .dashboard-plotly-chart {
+        min-height: 280px;
+    }
+}
+
+[data-bs-theme="dark"] .bg-white {
+    background-color: var(--bs-body-bg) !important;
+}
+
+[data-bs-theme="dark"] .card-header {
+    background-color: var(--bs-body-bg) !important;
+}
+
+[data-bs-theme="dark"] .text-bg-light {
+    background-color: var(--bs-tertiary-bg) !important;
+    color: var(--bs-body-color) !important;
+}
+
+[data-bs-theme="dark"] .border {
+    border-color: var(--bs-border-color) !important;
+}
+
+[data-bs-theme="dark"] .table {
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--bs-body-color);
+    --bs-table-border-color: var(--bs-border-color);
+}
+
+[data-bs-theme="dark"] .form-control,
+[data-bs-theme="dark"] .form-select {
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+    border-color: var(--bs-border-color);
+}
+
+[data-bs-theme="dark"] .form-control::placeholder {
+    color: var(--bs-secondary-color);
+}
+
+footer {
+    background-color: var(--bs-body-bg) !important;
+    color: var(--bs-body-color) !important;
+}
+
+footer .text-muted {
+    color: var(--bs-secondary-color) !important;
+}
+
+/* E10 - CarbonIQ Color System */
+
+:root {
+    --carbon-green: #20c997;
+    --carbon-blue: #0d6efd;
+    --carbon-purple: #6f42c1;
+    --carbon-teal: #0dcaf0;
+    --carbon-orange: #fd7e14;
+    --carbon-amber: #ffc107;
+    --carbon-red: #dc3545;
+    --carbon-pink: #d63384;
+}
+
+[data-bs-theme="dark"] {
+    --carbon-surface-accent: rgba(255, 255, 255, 0.04);
+    --carbon-border-accent: rgba(255, 255, 255, 0.12);
+}
+
+[data-bs-theme="light"] {
+    --carbon-surface-accent: rgba(0, 0, 0, 0.02);
+    --carbon-border-accent: rgba(0, 0, 0, 0.10);
+}
+
+.carbon-accent-green {
+    color: var(--carbon-green) !important;
+}
+
+.carbon-accent-blue {
+    color: var(--carbon-blue) !important;
+}
+
+.carbon-accent-purple {
+    color: var(--carbon-purple) !important;
+}
+
+.carbon-accent-teal {
+    color: var(--carbon-teal) !important;
+}
+
+.carbon-accent-orange {
+    color: var(--carbon-orange) !important;
+}
+
+.carbon-accent-amber {
+    color: var(--carbon-amber) !important;
+}
+
+.carbon-accent-red {
+    color: var(--carbon-red) !important;
+}
+
+.carbon-accent-pink {
+    color: var(--carbon-pink) !important;
+}
+
+.carbon-brand {
+    color: var(--carbon-green) !important;
+    font-weight: 600;
+}
+
+.carbon-brand:hover {
+    color: #63e6be !important;
+}
+
+.carbon-home-title {
+    color: var(--carbon-green);
+    font-weight: 600;
+}
+
+.carbon-home-subtitle {
+    color: var(--bs-secondary-color);
+}
+
+.carbon-home-tagline {
+    color: var(--carbon-blue);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+}
+
+.card {
+    position: relative;
+    border: 1px solid var(--carbon-border-accent) !important;
+    border-radius: 1rem !important;
+    background: var(--carbon-card-bg) !important;
+    box-shadow: var(--carbon-card-shadow) !important;
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        border-color 0.25s ease;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--carbon-card-shadow-hover) !important;
+}
+
+.card-header {
+    background: transparent !important;
+    border-bottom: 1px solid var(--carbon-border-accent) !important;
+}
+
+:root {
+    --carbon-card-bg: rgba(255, 255, 255, 0.88);
+    --carbon-card-shadow:
+        0 8px 25px rgba(13, 110, 253, 0.08);
+    --carbon-card-shadow-hover:
+        0 14px 35px rgba(13, 110, 253, 0.14);
+}
+
+[data-bs-theme="dark"] {
+    --carbon-card-bg: rgba(255, 255, 255, 0.035);
+    --carbon-card-shadow:
+        0 8px 28px rgba(0, 0, 0, 0.30);
+    --carbon-card-shadow-hover:
+        0 16px 40px rgba(0, 0, 0, 0.42);
+}
+
+.carbon-card-green {
+    border-top: 3px solid var(--carbon-green) !important;
+}
+
+.carbon-card-blue {
+    border-top: 3px solid var(--carbon-blue) !important;
+}
+
+.carbon-card-amber {
+    border-top: 3px solid var(--carbon-amber) !important;
+}
+
+.profile-info-item {
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--carbon-border-accent);
+    border-radius: 0.75rem;
+    background: var(--carbon-surface-accent);
+}
+
+/* E10 - Dashboard section accents */
+
+.carbon-section-green {
+    border-top: 3px solid var(--carbon-green) !important;
+}
+
+.carbon-section-blue {
+    border-top: 3px solid var(--carbon-blue) !important;
+}
+
+.carbon-section-purple {
+    border-top: 3px solid var(--carbon-purple) !important;
+}
+
+.carbon-section-teal {
+    border-top: 3px solid var(--carbon-teal) !important;
+}
+
+.carbon-section-amber {
+    border-top: 3px solid var(--carbon-amber) !important;
+}
+
+.carbon-section-red {
+    border-top: 3px solid var(--carbon-red) !important;
+}
+
+/* E10 - Recommendation guidance note */
+
+.carbon-guidance-note {
+    background: var(--carbon-surface-accent);
+    color: var(--bs-body-color);
+    border-color: var(--carbon-border-accent) !important;
+}
+
+/* E10 - Recommendation action cards */
+
+.recommendation-action-card {
+    overflow: hidden;
+}
+
+.recommendation-action-card:hover {
+    transform: translateY(-4px);
+}
+
+.recommendation-action-icon {
+    flex: 0 0 auto;
+    width: 2rem;
+    height: 2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.65rem;
+    color: var(--carbon-green);
+    background: var(--carbon-surface-accent);
+    border: 1px solid var(--carbon-border-accent);
+}
+
+.recommendation-score-badge {
+    flex: 0 0 auto;
+    background: var(--carbon-surface-accent);
+    color: var(--carbon-blue);
+    border: 1px solid var(--carbon-border-accent);
+}
+
+.recommendation-category-label {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.3rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--carbon-blue);
+    background: var(--carbon-surface-accent);
+    border: 1px solid var(--carbon-border-accent);
+}
+
+.recommendation-description {
+    line-height: 1.6;
+}
+
+.recommendation-reason {
+    border-color: var(--carbon-border-accent) !important;
+}
+
+/* E10 - Offset guidance project header */
+
+.offset-project-icon {
+    flex: 0 0 auto;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.75rem;
+    color: var(--carbon-teal);
+    background: var(--carbon-surface-accent);
+    border: 1px solid var(--carbon-border-accent);
+    font-size: 1.15rem;
+}
+
+.offset-guidance-rank {
+    background: var(--carbon-blue);
+    color: #fff;
+}
+
+.offset-guidance-score {
+    background: var(--carbon-surface-accent);
+    color: var(--carbon-blue);
+    border: 1px solid var(--carbon-border-accent);
+}
+
+/* E10 - Offset metadata cards */
+
+.offset-meta-card {
+    position: relative;
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.offset-meta-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--carbon-border-accent) !important;
+    box-shadow: var(--carbon-card-shadow-hover);
+}
+
+.offset-meta-icon {
+    width: 2rem;
+    height: 2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.65rem;
+    border-radius: 0.6rem;
+    background: var(--carbon-surface-accent);
+    border: 1px solid var(--carbon-border-accent);
+}
+
+/* E10 - Offset suitability */
+
+.offset-suitability-card {
+    background: var(--carbon-surface-accent);
+}
+
+.offset-suitability-icon {
+    width: 2rem;
+    height: 2rem;
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.6rem;
+    color: var(--carbon-green);
+    background: var(--carbon-surface-accent);
+    border: 1px solid var(--carbon-border-accent);
+}
+
+.offset-suitability-factor {
+    padding: 0.65rem 0.75rem;
+    border-radius: 0.65rem;
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.offset-suitability-factor:hover {
+    background: var(--carbon-surface-accent);
+}
+
+/* E10 - Offset guidance base styles */
+
+.offset-guidance-card {
+    border-radius: 0.75rem;
+}
+
+.offset-guidance-card:hover {
+    transform: translateY(-2px);
+}
+
+.offset-guidance-score {
+    min-width: 64px;
+}
+
+.offset-guidance-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.offset-guidance-link {
+    text-decoration: none;
+}
+
+.offset-guidance-link:hover {
+    text-decoration: underline;
+}
+
+/* E10 - Indicative offset equivalent */
+
+.offset-equivalent-card {
+    background: var(--carbon-surface-accent);
+    border-color: var(--carbon-border-accent) !important;
+}
+
+.offset-equivalent-icon {
+    width: 2.25rem;
+    height: 2.25rem;
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.7rem;
+    color: var(--carbon-teal);
+    background: var(--carbon-surface-accent);
+    border: 1px solid var(--carbon-border-accent);
+}
+
+/* E10 - Offset source actions and guidance */
+
+.offset-source-actions {
+    align-items: center;
+}
+
+.offset-source-actions .btn {
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.offset-source-actions .btn:hover {
+    transform: translateY(-1px);
+}
+
+.offset-guidance-footer {
+    border-color: var(--carbon-border-accent) !important;
+    padding-top: 1rem !important;
+}
+
+.offset-guidance-message {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.1rem;
+    line-height: 1.55;
+}
+
+/* E10 - Carbon calculator */
+
+.calculator-activity-card {
+    background: var(--carbon-surface-accent);
+    border-color: var(--carbon-border-accent) !important;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+}
+
+.calculator-activity-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--carbon-card-shadow-hover);
+}
+
+.calculator-activity-card .form-label {
+    font-weight: 600;
+}
+
+.calculator-activity-card .unit-display {
+    color: var(--bs-secondary-color);
+    background: var(--bs-tertiary-bg);
+}
+
+.calculator-activity-card .remove-activity {
+    width: 100%;
+}
+
+/* E10 - Carbon result */
+
+.result-footprint-card {
+    background: var(--carbon-surface-accent);
+    border: 1px solid var(--carbon-border-accent);
+}
+
+.result-footprint-card h2 {
+    color: var(--carbon-green);
+}
+
+/* E10 - Result section icon */
+
+.result-section-icon {
+    width: 2rem;
+    height: 2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.6rem;
+    color: var(--carbon-blue);
+    background: var(--carbon-surface-accent);
+    border: 1px solid var(--carbon-border-accent);
+}
+
+/* E10 - Authentication pages */
+
+.auth-card {
+    overflow: hidden;
+}
+
+.auth-card .card-body {
+    min-height: 100%;
+}
+
+.auth-card form p {
+    margin-bottom: 1rem;
+}
+
+.auth-card form label {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-weight: 600;
+}
+
+.auth-card form ul.errorlist {
+    margin: 0.35rem 0 0;
+    padding-left: 1rem;
+    color: var(--bs-danger);
+    font-size: 0.875rem;
+}
+
+.auth-card form .helptext {
+    display: block;
+    margin-top: 0.35rem;
+    color: var(--bs-secondary-color);
+    font-size: 0.8rem;
+}
+
+.auth-icon {
+    width: 3.25rem;
+    height: 3.25rem;
+    margin-inline: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.9rem;
+    font-size: 1.35rem;
+    background: var(--carbon-surface-accent);
+    border: 1px solid var(--carbon-border-accent);
+}
+
+.auth-icon-purple {
+    color: var(--carbon-purple);
+}
+
+.auth-icon-green {
+    color: var(--carbon-green);
+}
+
+.auth-submit-btn {
+    padding-top: 0.65rem;
+    padding-bottom: 0.65rem;
 }

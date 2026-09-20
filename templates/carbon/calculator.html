@@ -9,7 +9,7 @@
 <div class="row justify-content-center">
     <div class="col-lg-9">
 
-        <div class="card shadow-sm">
+        <div class="card shadow-sm carbon-section-green">
             <div class="card-body p-4">
 
                 <div class="mb-4">
@@ -33,7 +33,7 @@
                     <div id="activity-formset">
 
                         {% for form in formset %}
-                            <div class="activity-form border rounded p-3 mb-3">
+                            <div class="activity-form border rounded p-3 mb-3 calculator-activity-card">
 
                                 <div class="row g-3 align-items-end">
 
@@ -89,8 +89,9 @@
                                             type="button"
                                             class="btn btn-outline-danger remove-activity"
                                             aria-label="Remove activity"
+                                            title="Remove activity"
                                         >
-                                            &times;
+                                            <i class="bi bi-trash3"></i>
                                         </button>
                                     </div>
 
@@ -102,7 +103,7 @@
                     </div>
 
                     <template id="empty-form-template">
-                        <div class="activity-form border rounded p-3 mb-3">
+                        <div class="activity-form border rounded p-3 mb-3 calculator-activity-card">
 
                             <div class="row g-3 align-items-end">
 
@@ -137,12 +138,13 @@
 
                                 <div class="col-md-1">
                                     <button
-                                        type="button"
-                                        class="btn btn-outline-danger remove-activity"
-                                        aria-label="Remove activity"
-                                    >
-                                        &times;
-                                    </button>
+                                    type="button"
+                                    class="btn btn-outline-danger remove-activity"
+                                    aria-label="Remove activity"
+                                    title="Remove activity"
+                                >
+                                    <i class="bi bi-trash3"></i>
+                                </button>
                                 </div>
 
                             </div>

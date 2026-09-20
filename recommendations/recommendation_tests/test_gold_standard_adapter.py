@@ -242,5 +242,5 @@ class GoldStandardAdapterTests(TestCase):
         self.assertEqual(
             project.registry_url,
             "https://registry.goldstandard.org/"
-            "projects/details/23755",
+            "projects?q=GS23755",
         )

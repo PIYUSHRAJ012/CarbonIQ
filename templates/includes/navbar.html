@@ -1,12 +1,21 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
 
-        <a class="navbar-brand"
-           href="{% url 'core:home' %}">
+        <a class="navbar-brand carbon-brand"
+        href="{% url 'core:home' %}">
             CarbonIQ
         </a>
 
         <div class="ms-auto">
+
+            <button
+                type="button"
+                id="theme-toggle"
+                class="btn btn-outline-light btn-sm me-2"
+                aria-label="Toggle dark mode"
+            >
+                <i class="bi bi-moon-stars-fill"></i>
+            </button>
 
             {% if user.is_authenticated %}
 
